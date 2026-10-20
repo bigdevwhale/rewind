@@ -47,12 +47,12 @@
     <string name="loan_two_weeks">2 недели</string>
 
     <string name="welcome_title">Смотреть стало слишком много. Поэтому не смотрим ничего.</string>
-    <string name="welcome_sub">Все фильмы, сериалы, альбомы и книги мира в одном касании, и вечер, потерянный на их пролистывание. Раньше кино любили, потому что его было мало: в пятницу идёшь в прокат, берёшь одну кассету, через два дня её надо вернуть. Это тот самый прокат, только на полках твой собственный список.</string>
+    <string name="welcome_sub">Все фильмы, сериалы, альбомы, книги и комиксы мира в одном касании, и вечер, потерянный на их пролистывание. Раньше кино любили, потому что его было мало: в пятницу идёшь в прокат, берёшь одну кассету, через два дня её надо вернуть. Это тот самый прокат, только на полках твой собственный список.</string>
     <string name="rules_title">Правила проката</string>
     <string name="rule_two">Две кассеты на руках</string>
     <string name="rule_two_sub">Чтобы взять новую, верни одну. Ничего не висит недосмотренным.</string>
     <string name="rule_due">Срок возврата</string>
-    <string name="rule_due_sub">Фильм или альбом на два вечера, сериал на неделю, книга на две недели. Перед возвратом перемотай кассету и напиши на квитке три слова.</string>
+    <string name="rule_due_sub">Фильм или альбом на два вечера, комикс на три дня, сериал на неделю, книга на две недели. Перед возвратом перемотай кассету и напиши на квитке три слова.</string>
     <string name="rule_hours">Работаем по вечерам</string>
     <string name="rule_hours_sub">По будням с шести вечера, в выходные с полудня, до одиннадцати. Никакого выбора в три часа ночи.</string>
     <string name="rule_window">Новинки на витрине</string>
@@ -92,7 +92,7 @@
     <string name="picks_of">%s советует</string>
     <string name="sticker_new">НОВИНКА</string>
     <string name="empty_title">На полках пока пусто</string>
-    <string name="empty_sub">Найди название в каталоге, поделись из Кинопоиска, IMDb, Spotify или LiveLib, или впиши вручную.</string>
+    <string name="empty_sub">Найди название в каталоге, поделись из Кинопоиска, IMDb, Spotify, LiveLib или Shikimori, или впиши вручную.</string>
     <string name="bin_title">Уценка</string>
     <string name="card_short">Абонемент</string>
     <string name="card_title">Абонемент</string>
@@ -132,7 +132,7 @@
     <string name="put_on_shelf">Выставить в прокат</string>
     <string name="search_hint">Название, на любом языке</string>
     <string name="search_none">Ничего не нашлось. Попробуй написать иначе или впиши вручную.</string>
-    <string name="search_sources">Фильмы и сериалы из Wikidata и Википедии, сериалы ещё из TVmaze, альбомы и книги из каталога iTunes. В интернет приложение ходит только ради поиска.</string>
+    <string name="search_sources">Фильмы и сериалы из Wikidata и Википедии, сериалы ещё из TVmaze, альбомы из iTunes, книги и комиксы из Wikidata и iTunes. В интернет приложение ходит только ради поиска.</string>
 
     <string name="receipt_head">ВИДЕО · АУДИО · КНИГИ</string>
     <string name="receipt_item">ТОВАР</string>
@@ -224,4 +224,62 @@
     <string name="n_late_text">Ничего страшного. Верни, когда сможешь.</string>
     <string name="n_shelf_title">«%s» на полке</string>
     <string name="n_shelf_text">Вышла с витрины, можно брать домой.</string>
+    <string name="kind_comic">Комикс</string>
+    <string name="aisle_comic">Комиксы</string>
+    <string name="loan_three_days">3 дня</string>
+    <plurals name="cards">
+        <item quantity="one">%d карточка</item>
+        <item quantity="few">%d карточки</item>
+        <item quantity="many">%d карточек</item>
+        <item quantity="other">%d карточки</item>
+    </plurals>
+    <plurals name="stamps">
+        <item quantity="one">%d штамп</item>
+        <item quantity="few">%d штампа</item>
+        <item quantity="many">%d штампов</item>
+        <item quantity="other">%d штампа</item>
+    </plurals>
+    <string name="hits_title">Хиты проката · от четырёх звёзд</string>
+    <string name="more_title">Ещё в прокате</string>
+    <string name="bin_count">уценено %1$d · выцветают %2$d</string>
+    <string name="slip_stars">ОЦЕНКА</string>
+    <string name="no_stars">без оценки</string>
+    <string name="taken_n">брали %s</string>
+    <string name="catalog_title">Картотека</string>
+    <string name="catalog_search">Название, автор, кто посоветовал…</string>
+    <string name="catalog_sort">Порядок</string>
+    <string name="catalog_empty">Таких карточек в ящике нет.</string>
+    <string name="sort_title">А–Я</string>
+    <string name="sort_rating">По оценке</string>
+    <string name="sort_taken">Чаще брали</string>
+    <string name="sort_newest">Новые</string>
+    <string name="sort_waiting">Дольше ждут</string>
+    <string name="sort_year">По году</string>
+    <string name="sort_length">По длине</string>
+    <string name="show_all">Все</string>
+    <string name="show_shelf">На полке</string>
+    <string name="show_out">На руках</string>
+    <string name="show_window">На витрине</string>
+    <string name="show_never">Ещё не брали</string>
+    <string name="show_seen">До конца</string>
+    <string name="show_bin">В уценке</string>
+    <string name="sec_no_stars">Без оценки</string>
+    <string name="sec_never">Ещё не брали</string>
+    <string name="sec_once">Один раз</string>
+    <string name="sec_few">Несколько раз</string>
+    <string name="sec_many">Пять раз и больше</string>
+    <string name="sec_out">Сейчас на руках</string>
+    <string name="sec_bleached">Выгорели</string>
+    <string name="sec_fading">Выцветают</string>
+    <string name="sec_fresh">Свежие</string>
+    <string name="sec_decade">%d-е</string>
+    <string name="sec_no_year">Без года</string>
+    <string name="sec_short">Около часа</string>
+    <string name="sec_evening">На вечер</string>
+    <string name="sec_long">Надолго</string>
+    <string name="st_out">НА
+РУКАХ</string>
+    <string name="st_window">НА
+ВИТРИНЕ</string>
+    <string name="st_bin">УЦЕНКА</string>
 </resources>

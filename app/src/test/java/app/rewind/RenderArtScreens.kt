@@ -12,6 +12,7 @@ import app.rewind.ui.Go
 import app.rewind.ui.Home
 import app.rewind.ui.art.Art
 import app.rewind.ui.card.CardScreen
+import app.rewind.ui.catalog.CatalogScreen
 import app.rewind.ui.mystery.MysteryScreen
 import app.rewind.ui.onboarding.WelcomeScreen
 import app.rewind.ui.rent.ReceiptScreen
@@ -78,6 +79,7 @@ abstract class ScreensBase {
     @Test fun receipt() = home().let { h -> shot("4-receipt", h) { hh, go -> ReceiptScreen(hh.out.last().id, hh, go) } }
     @Test fun wrapped() = home().let { shot("5-wrapped", it) { h, go -> MysteryScreen(h, go) } }
     @Test fun card() = home().let { h -> shot("6-card", h) { hh, go -> CardScreen(hh, go) } }
+    @Test fun catalog() = home().let { shot("8-catalog", it) { h, go -> CatalogScreen(h, go) } }
     @Test fun lovedTape() = home().let { h -> shot("7-loved", h) { hh, go -> TapeScreen(loved(hh).id, hh, go) } }
 }
 

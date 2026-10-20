@@ -147,7 +147,7 @@ private fun creatorLabel(k: Kind) = when (k) {
     Kind.FILM -> R.string.f_director
     Kind.SERIES -> R.string.f_network
     Kind.ALBUM -> R.string.f_artist
-    Kind.BOOK -> R.string.f_author
+    Kind.BOOK, Kind.COMIC -> R.string.f_author
 }
 
 /** The box as it'll stand on the shelf: the catalogue's picture if one was picked. */

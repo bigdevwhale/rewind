@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -44,6 +45,7 @@ import app.rewind.ui.Home
 import app.rewind.ui.T
 import app.rewind.ui.art.Art
 import app.rewind.ui.art.Reels
+import app.rewind.ui.art.Stars
 import app.rewind.ui.components.Field
 import app.rewind.ui.components.PrimaryButton
 import app.rewind.ui.components.SectionTitle
@@ -68,6 +70,7 @@ fun ReturnScreen(id: Long, h: Home, go: Go) {
     var words by rememberSaveable { mutableStateOf("") }
     var scene by rememberSaveable { mutableStateOf("") }
     var note by rememberSaveable { mutableStateOf("") }
+    var stars by rememberSaveable { mutableIntStateOf(0) }
     var wound by rememberSaveable { mutableFloatStateOf(if (Art.still) 0.62f else 0f) }
     var spin by rememberSaveable { mutableFloatStateOf(0f) }
     var holding by rememberSaveable { mutableStateOf(false) }
@@ -107,6 +110,14 @@ fun ReturnScreen(id: Long, h: Home, go: Go) {
                 style = UType.Small.copy(color = if (wound >= 1f) U.c.cyan else U.c.faint), modifier = Modifier.padding(top = 6.dp),
             )
             SectionTitle(stringResource(R.string.slip_title))
+            Box(Modifier.fillMaxWidth().clip(U.RSm).background(U.c.paper).padding(horizontal = 16.dp, vertical = 12.dp)) {
+                Column {
+                    Text(stringResource(R.string.slip_stars), style = UType.Receipt)
+                    Spacer(Modifier.height(6.dp))
+                    Stars(stars, size = 36.dp, onChange = { stars = it })
+                }
+            }
+            Spacer(Modifier.height(10.dp))
             Field(words, { words = it }, stringResource(R.string.f_words), style = UType.Note)
             Spacer(Modifier.height(8.dp))
             Field(scene, { scene = it }, stringResource(R.string.f_scene), singleLine = false, minLines = 2, style = UType.Note)
@@ -120,7 +131,7 @@ fun ReturnScreen(id: Long, h: Home, go: Go) {
             PrimaryButton(
                 stringResource(if (wound >= 1f) R.string.hand_in else R.string.rewind_first),
                 {
-                    c.container.write { store.giveBack(id, outcome, words, scene, note) }
+                    c.container.write { store.giveBack(id, outcome, words, scene, note, stars) }
                     go.home()
                 },
                 Modifier.fillMaxWidth(),
@@ -134,7 +145,7 @@ private fun label(o: Outcome, k: Kind) = when (o) {
     Outcome.WATCHED -> when (k) {
         Kind.FILM, Kind.SERIES -> R.string.out_watched
         Kind.ALBUM -> R.string.out_heard
-        Kind.BOOK -> R.string.out_read
+        Kind.BOOK, Kind.COMIC -> R.string.out_read
     }
     Outcome.REWOUND -> R.string.out_rewound
 }

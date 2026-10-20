@@ -19,14 +19,15 @@ import java.util.UUID
 /**
  * Looking a title up, so a tape comes in with its cover, year, maker and length. All free and
  * keyless: films and series from Wikidata (posters from Wikipedia), series also from TVmaze, albums
- * and books from Apple's iTunes Search, books also from Wikidata. This is the only thing that goes
- * online, and only when someone searches.
+ * from Apple's iTunes Search, books and comics (manga too) from Wikidata and iTunes. This is the
+ * only thing that goes online, and only when someone searches.
  */
 object Catalog {
     private const val AGENT = "Rewind/1.0 (https://github.com/bigdevwhale/rewind)"
 
     private val films = setOf("Q11424", "Q202866", "Q24869", "Q506240", "Q93204", "Q17517379", "Q226730")
     private val series = setOf("Q5398426", "Q581714", "Q1259759", "Q526877", "Q117467246", "Q63952888")
+    private val comics = setOf("Q1004", "Q14406742", "Q8274", "Q21198342", "Q725377", "Q1760610", "Q867335", "Q838795", "Q74262765")
     private val books = setOf("Q7725634", "Q8261", "Q571", "Q47461344", "Q49084", "Q1667921", "Q5185279", "Q25379", "Q12308638")
 
     suspend fun search(kind: Kind, query: String, ru: Boolean): List<Draft> = withContext(Dispatchers.IO) {
@@ -38,6 +39,7 @@ object Catalog {
                 Kind.SERIES -> listOf(async { tvmaze(q) }, async { wikidata(q, kind, series, ru) })
                 Kind.ALBUM -> listOf(async { itunes(q, kind, ru) })
                 Kind.BOOK -> listOf(async { wikidata(q, kind, books, ru) }, async { itunes(q, kind, ru) })
+                Kind.COMIC -> listOf(async { wikidata(q, kind, comics, ru) }, async { itunes(q, kind, ru) })
             }.awaitAll()
         }
         // Each source in turn, best first, without the same title twice.
@@ -126,6 +128,7 @@ object Catalog {
             Kind.FILM -> listOf("P57")
             Kind.SERIES -> listOf("P170", "P57", "P449")
             Kind.BOOK -> listOf("P50")
+            Kind.COMIC -> listOf("P50", "P170")
             Kind.ALBUM -> listOf("P175")
         }
         class Raw(val label: String, val year: Int?, val minutes: Int?, val maker: String?, val enwiki: String?, val ruwiki: String?, val image: String?)

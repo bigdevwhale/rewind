@@ -46,6 +46,9 @@ import app.rewind.data.Tape
 import app.rewind.ui.theme.Block
 import app.rewind.ui.theme.Mono
 import kotlin.random.Random
+import kotlin.math.sin
+import kotlin.math.cos
+import kotlin.math.PI
 
 /** Width over height of each kind's case: a VHS box, a box set, an audio cassette, a library book. */
 fun Kind.aspect(): Float = when (this) {
@@ -53,6 +56,7 @@ fun Kind.aspect(): Float = when (this) {
     Kind.SERIES -> 0.66f
     Kind.ALBUM -> 0.64f
     Kind.BOOK -> 0.68f
+    Kind.COMIC -> 0.66f
 }
 
 /**
@@ -74,6 +78,7 @@ fun TapeBox(tape: Tape, cover: ImageBitmap?, modifier: Modifier = Modifier, widt
                 Kind.SERIES -> BoxSet(tape, cover, scheme, w, fade)
                 Kind.ALBUM -> Cassette(tape, cover, scheme, w, fade)
                 Kind.BOOK -> Book(tape, cover, scheme, w, fade)
+                Kind.COMIC -> Comic(tape, cover, scheme, w, fade)
             }
             // Sun: the colours wash out toward a pale blue-white.
             if (fade > 0f) Box(Modifier.fillMaxSize().background(Color(0xFFE4EEEC).copy(alpha = 0.55f * fade)))
@@ -210,6 +215,55 @@ private fun Book(tape: Tape, cover: ImageBitmap?, s: Art.Scheme, w: Dp, fade: Fl
             val spine = size.width * 0.08f
             drawRect(Brush.horizontalGradient(listOf(Color.Black.copy(alpha = 0.55f), Color.Black.copy(alpha = 0.2f)), endX = spine), size = Size(spine, size.height))
             drawLine(Color.Black.copy(alpha = 0.35f), Offset(spine * 1.4f, 0f), Offset(spine * 1.4f, size.height), 1.2f)
+        }
+    }
+}
+
+/**
+ * A comic: a newsstand issue, the masthead across the top, the price box in the corner, and on a
+ * drawn one, halftone dots and a burst behind the title.
+ */
+@Composable
+private fun Comic(tape: Tape, cover: ImageBitmap?, s: Art.Scheme, w: Dp, fade: Float) {
+    Box(Modifier.fillMaxSize()) {
+        if (cover != null) Picture(cover, fade, Modifier.fillMaxSize())
+        else {
+            Canvas(Modifier.fillMaxSize()) {
+                drawRect(s.band)
+                // Halftone: dots growing toward the bottom.
+                val step = size.width / 14f
+                var y = step / 2
+                var row = 0
+                while (y < size.height) {
+                    var x = if (row % 2 == 0) step / 2 else step
+                    val r = step * 0.12f + step * 0.3f * (y / size.height)
+                    while (x < size.width) { drawCircle(s.accent.copy(alpha = 0.55f), r, Offset(x, y)); x += step }
+                    y += step * 0.87f
+                    row++
+                }
+                // A burst behind the title.
+                val c = Offset(size.width * 0.5f, size.height * 0.62f)
+                val burst = Path()
+                repeat(24) { k ->
+                    val a = k * PI.toFloat() / 12
+                    val rr = if (k % 2 == 0) size.width * 0.48f else size.width * 0.3f
+                    if (k == 0) burst.moveTo(c.x + cos(a) * rr, c.y + sin(a) * rr) else burst.lineTo(c.x + cos(a) * rr, c.y + sin(a) * rr)
+                }
+                burst.close()
+                drawPath(burst, s.ink)
+                drawPath(burst, Color(0xFF111111), style = Stroke(2.dp.toPx()))
+            }
+            Box(Modifier.align(Alignment.Center).padding(top = w * 0.32f, start = w * 0.14f, end = w * 0.14f)) {
+                BoxTitle(tape.title, Color(0xFF111111), w * 0.8f, align = TextAlign.Center, lines = 3)
+            }
+        }
+        // Masthead and the price box.
+        Box(Modifier.fillMaxWidth().background(if (cover != null) Color(0xFF111111).copy(alpha = 0.78f) else s.ground).padding(start = w * 0.24f, end = w * 0.05f, top = w * 0.03f, bottom = w * 0.03f)) {
+            Small(tape.creator.ifBlank { "COMICS" }.uppercase(), if (cover != null) Color.White else s.ink, w)
+        }
+        Column(Modifier.width(w * 0.2f).background(Color.White).padding(vertical = w * 0.015f), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("№" + (1 + (tape.seed.mod(40L))).toString(), style = TextStyle(fontFamily = Block, fontSize = (w.value * 0.07f).sp, color = Color(0xFF111111)))
+            Text("25¢", style = TextStyle(fontFamily = Mono, fontSize = (w.value * 0.05f).sp, color = Color(0xFF111111)))
         }
     }
 }

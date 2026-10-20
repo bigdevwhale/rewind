@@ -7,6 +7,12 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -247,4 +253,40 @@ fun DrawScope.zigzag(color: Color, top: Boolean) {
     }
     path.close()
     drawPath(path, color)
+}
+
+/**
+ * Stars drawn in ballpoint, as on a return slip: [n] of five filled in. With [onChange], tapping a
+ * star sets it, and tapping the one already set takes the stars off.
+ */
+@Composable
+fun Stars(n: Int, modifier: Modifier = Modifier, size: Dp = 26.dp, color: Color = U.c.pen, onChange: ((Int) -> Unit)? = null) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(size * 0.18f)) {
+        (1..5).forEach { i ->
+            val on = i <= n
+            Canvas(
+                Modifier.size(size).then(
+                    if (onChange != null) Modifier.pointerInput(n) { detectTapGestures { onChange(if (i == n) 0 else i) } } else Modifier,
+                ),
+            ) {
+                val path = star(this.size.width / 2, this.size.height / 2, this.size.minDimension / 2 * 0.95f, i)
+                if (on) drawPath(path, color.copy(alpha = 0.85f))
+                drawPath(path, color.copy(alpha = if (on) 1f else 0.35f), style = Stroke(this.size.minDimension * 0.06f, join = StrokeJoin.Round))
+            }
+        }
+    }
+}
+
+/** A five-pointed star, a little uneven from the pen ([wobble] seeds which way). */
+private fun star(cx: Float, cy: Float, r: Float, wobble: Int): Path {
+    val rnd = Random(wobble * 31)
+    return Path().apply {
+        repeat(10) { k ->
+            val a = -PI.toFloat() / 2 + k * PI.toFloat() / 5 + (rnd.nextFloat() - 0.5f) * 0.08f
+            val rr = (if (k % 2 == 0) r else r * 0.45f) * (0.94f + rnd.nextFloat() * 0.1f)
+            val p = Offset(cx + cos(a) * rr, cy + sin(a) * rr)
+            if (k == 0) moveTo(p.x, p.y) else lineTo(p.x, p.y)
+        }
+        close()
+    }
 }

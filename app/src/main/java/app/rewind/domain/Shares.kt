@@ -81,6 +81,7 @@ object Shares {
     fun kindOf(link: String): Kind? {
         val l = link.lowercase()
         return when {
+            listOf("comicvine", "myanimelist.net/manga", "shikimori.one/mangas", "mangalib", "remanga", "comixology", "webtoons", "marvel.com/comics").any { it in l } -> Kind.COMIC
             listOf("/series/", "myshows.me", "tvmaze").any { it in l } -> Kind.SERIES
             listOf("kinopoisk", "imdb.com", "letterboxd", "ivi.ru", "okko.tv", "themoviedb").any { it in l } -> Kind.FILM
             listOf("spotify", "music.yandex", "music.apple", "bandcamp", "deezer", "music.youtube", "soundcloud", "tidal").any { it in l } -> Kind.ALBUM

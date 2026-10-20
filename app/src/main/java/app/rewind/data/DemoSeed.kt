@@ -9,7 +9,7 @@ import java.time.ZoneId
 
 /**
  * A lived-in store for the demo build and the screenshots, as of an evening (8:30 pm): well-known
- * films, series, albums and books on the shelves with drawn boxes, a few months of slips, two tapes
+ * films, series, albums, books and comics on the shelves with drawn boxes, a few months of slips, two tapes
  * at home, two in the window, a friend's shelf, one bleached by the sun and one in the bin.
  */
 object DemoSeed {
@@ -35,6 +35,9 @@ object DemoSeed {
         Item(Kind.BOOK, "The Master and Margarita", "Мастер и Маргарита", "Mikhail Bulgakov", "Михаил Булгаков", 1967, 900, "Read it at school and understood nothing.", "Читал в школе и ничего не понял.", age = 130),
         Item(Kind.BOOK, "Roadside Picnic", "Пикник на обочине", "Arkady & Boris Strugatsky", "Аркадий и Борис Стругацкие", 1972, 300, "After Stalker, to see what it was really about.", "После «Сталкера» — понять, о чём это было на самом деле.", age = 90),
         Item(Kind.BOOK, "Stoner", "Стоунер", "John Williams", "Джон Уильямс", 1965, 420, age = 20),
+        Item(Kind.COMIC, "Maus", "Маус", "Art Spiegelman", "Арт Шпигельман", 1986, 90, "The one comic everyone says is literature.", "Тот самый комикс, который все называют литературой.", age = 100),
+        Item(Kind.COMIC, "Persepolis", "Персеполис", "Marjane Satrapi", "Маржан Сатрапи", 2000, 80, age = 45),
+        Item(Kind.COMIC, "Watchmen", "Хранители", "Alan Moore", "Алан Мур", 1986, 150, "Before the series, properly.", "До сериала, как положено.", age = 16),
         // A friend's picks.
         Item(Kind.FILM, "Perfect Days", "Идеальные дни", "Wim Wenders", "Вим Вендерс", 2023, 124, "You'll want to wash the dishes slowly afterwards.", "После него захочется медленно мыть посуду.", "Anya", "Аня", age = 12),
         Item(Kind.ALBUM, "Blue", "Blue", "Joni Mitchell", "Джони Митчелл", 1971, 36, "Headphones, the whole thing, lying down.", "В наушниках, целиком, лёжа.", "Anya", "Аня", age = 25),
@@ -89,28 +92,30 @@ object DemoSeed {
             )
         }
         val slips = if (ru) slipsRu else slipsEn
-        suspend fun back(title: String, outDaysAgo: Double, hours: Double, slip: Int?, outcome: Outcome = Outcome.WATCHED, note: String = "", mystery: Boolean = false) {
+        suspend fun back(title: String, outDaysAgo: Double, hours: Double, slip: Int?, outcome: Outcome = Outcome.WATCHED, note: String = "", mystery: Boolean = false, stars: Int = 0) {
             val id = ids.getValue(title)
             val kind = items.first { it.en == title }.kind
             val out = ago(outDaysAgo)
             val (w, s) = slip?.let { slips[it] } ?: ("" to "")
-            dao.insert(Rental(tapeId = id, outAt = out, dueAt = Rules.due(kind, out), backAt = out + (hours * Rules.HOUR).toLong(), outcome = outcome.name, words = w, scene = s, note = note, mystery = mystery))
+            dao.insert(Rental(tapeId = id, outAt = out, dueAt = Rules.due(kind, out), backAt = out + (hours * Rules.HOUR).toLong(), outcome = outcome.name, words = w, scene = s, note = note, mystery = mystery, stars = stars))
         }
-        back("Stalker", 140.0, 30.0, 0)
-        back("Groundhog Day", 120.0, 26.0, null)
-        back("Paris, Texas", 100.0, 52.0, 1)
-        back("Kind of Blue", 95.0, 20.0, 3)
-        back("Twin Peaks", 88.0, 160.0, 5)
+        back("Stalker", 140.0, 30.0, 0, stars = 5)
+        back("Groundhog Day", 120.0, 26.0, null, stars = 4)
+        back("Paris, Texas", 100.0, 52.0, 1, stars = 5)
+        back("Kind of Blue", 95.0, 20.0, 3, stars = 4)
+        back("Twin Peaks", 88.0, 160.0, 5, stars = 5)
+        back("Maus", 80.0, 60.0, null, stars = 5)
         back("Kind of Blue", 70.0, 40.0, null)
-        back("In the Mood for Love", 62.0, 22.0, 2, mystery = true)
-        back("Blood Type", 55.0, 30.0, 4)
+        back("In the Mood for Love", 62.0, 22.0, 2, mystery = true, stars = 4)
+        back("Blood Type", 55.0, 30.0, 4, stars = 3)
         back("The Master and Margarita", 50.0, 300.0, null, Outcome.REWOUND, if (ru) "Не то время года. Вернусь осенью." else "Wrong season for it. Back in the autumn.")
+        back("Persepolis", 35.0, 50.0, null, stars = 4)
         back("Stalker", 30.0, 44.0, null)
-        back("Kind of Blue", 20.0, 18.0, null)
-        back("Roadside Picnic", 18.0, 200.0, null)
-        back("Blue", 9.0, 26.0, null)
+        back("Kind of Blue", 20.0, 18.0, null, stars = 5)
+        back("Roadside Picnic", 18.0, 200.0, null, stars = 4)
+        back("Blue", 9.0, 26.0, null, stars = 5)
         back("Kind of Blue", 6.0, 22.0, null)
-        back("Spirited Away", 4.0, 30.0, null, mystery = true)
+        back("Spirited Away", 4.0, 30.0, null, mystery = true, stars = 3)
         // At home now: a film due tomorrow evening, and a series with five days to go.
         dao.insert(Rental(tapeId = ids.getValue("Perfect Days"), outAt = ago(1.0), dueAt = Rules.due(Kind.FILM, ago(1.0))))
         dao.insert(Rental(tapeId = ids.getValue("Severance"), outAt = ago(2.0), dueAt = Rules.due(Kind.SERIES, ago(2.0))))

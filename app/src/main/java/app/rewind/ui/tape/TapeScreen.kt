@@ -49,6 +49,7 @@ import app.rewind.ui.Go
 import app.rewind.ui.Home
 import app.rewind.ui.T
 import app.rewind.ui.art.Stamp
+import app.rewind.ui.art.Stars
 import app.rewind.ui.art.TapeBox
 import app.rewind.ui.art.rememberCover
 import app.rewind.ui.components.PrimaryButton
@@ -86,8 +87,13 @@ fun TapeScreen(id: Long, h: Home, go: Go) {
                     Spacer(Modifier.height(8.dp))
                     Text(listOfNotNull(t.year?.toString(), T.minutes(c, t.length).takeIf { t.minutes != null }).joinToString(" · "), style = UType.Small)
                     Text(stringResource(R.string.loan_for, T.loan(c, t.kindOf)), style = UType.Small.copy(color = U.c.cyan))
-                    val seen = h.watched(t)
+                    val seen = h.taken(t)
                     if (seen > 0) Text(stringResource(R.string.seen_times, T.plural(c, R.plurals.times, seen)), style = UType.Small)
+                    // Stars from the latest slip; tap to think again.
+                    h.lastSlip(t)?.let { slip ->
+                        Spacer(Modifier.height(8.dp))
+                        Stars(h.stars(t), size = 24.dp, color = U.c.amber, onChange = { n -> container.write { store.rate(slip.id, n) } })
+                    }
                 }
             }
             // The back of the box.
@@ -143,6 +149,7 @@ fun Slip(r: Rental, title: String? = null) {
         Column(Modifier.padding(end = 64.dp)) {
             Text(T.date(c, r.backAt).uppercase() + if (r.mystery) "  ·  " + stringResource(R.string.slip_wrapped) else "", style = UType.Receipt.copy(color = Color(0xFF6A6372)))
             if (title != null) Text(title, style = UType.Receipt.copy(fontSize = UType.Receipt.fontSize * 1.1f))
+            if (r.stars > 0) Stars(r.stars, Modifier.padding(vertical = 4.dp), size = 16.dp)
             if (r.words.isNotBlank()) Text(r.words, style = UType.Note)
             if (r.scene.isNotBlank()) Text("«" + r.scene + "»", style = UType.Note.copy(fontSize = UType.Note.fontSize * 0.85f))
             if (r.note.isNotBlank()) Text(r.note, style = UType.Note.copy(fontSize = UType.Note.fontSize * 0.85f, color = U.c.stamp))

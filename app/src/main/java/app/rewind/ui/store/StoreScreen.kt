@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CardGiftcard
 import androidx.compose.material.icons.rounded.Inventory2
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Style
 import androidx.compose.material3.Icon
@@ -52,9 +53,12 @@ import app.rewind.ui.Home
 import app.rewind.ui.T
 import app.rewind.ui.art.NeonSign
 import app.rewind.ui.art.ShelfLedge
+import app.rewind.ui.art.Stars
 import app.rewind.ui.art.TapeBox
 import app.rewind.ui.art.rememberCover
+import app.rewind.ui.components.InfoRow
 import app.rewind.ui.components.SectionTitle
+import app.rewind.ui.components.UCard
 import app.rewind.ui.components.SoftButton
 import app.rewind.ui.ctx
 import app.rewind.ui.theme.U
@@ -71,8 +75,9 @@ fun StoreScreen(h: Home, go: Go) {
         item {
             Column(Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = go::card) { Icon(Icons.Rounded.Style, stringResource(R.string.card_title), tint = U.c.muted) }
+                    IconButton(onClick = go::catalog) { Icon(Icons.Rounded.Search, stringResource(R.string.catalog_title), tint = U.c.muted) }
                     Spacer(Modifier.weight(1f))
+                    IconButton(onClick = go::card) { Icon(Icons.Rounded.Style, stringResource(R.string.card_title), tint = U.c.muted) }
                     IconButton(onClick = go::settings) { Icon(Icons.Rounded.Settings, stringResource(R.string.settings), tint = U.c.muted) }
                 }
                 NeonSign(
@@ -95,6 +100,7 @@ fun StoreScreen(h: Home, go: Go) {
         if (h.window.isNotEmpty()) item {
             Aisle(stringResource(R.string.window_title), h.window, h, go) { t -> stringResource(R.string.window_in, T.left(c, t.readyAt - h.now)) }
         }
+        if (h.hits.isNotEmpty()) item(key = "hits") { Aisle(stringResource(R.string.hits_title), h.hits, h, go) }
         Kind.entries.forEach { k ->
             val tapes = h.aisle(k)
             if (tapes.isNotEmpty()) item(key = "aisle-$k") { Aisle(T.aisle(c, k), tapes, h, go) }
@@ -104,12 +110,13 @@ fun StoreScreen(h: Home, go: Go) {
         }
         if (h.tapes.isEmpty()) item { Empty() }
         item {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                SoftButton(
-                    stringResource(R.string.bin_title) + if (h.bin.size + h.bleached.size > 0) " · ${h.bin.size + h.bleached.size}" else "",
-                    go::bin, Modifier.weight(1f), icon = Icons.Rounded.Inventory2,
-                )
-                SoftButton(stringResource(R.string.card_short), go::card, Modifier.weight(1f), icon = Icons.Rounded.Style)
+            Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
+                SectionTitle(stringResource(R.string.more_title))
+                UCard(padding = PaddingValues(horizontal = 14.dp, vertical = 4.dp)) {
+                    InfoRow(Icons.Rounded.Search, stringResource(R.string.catalog_title), T.plural(c, R.plurals.cards, h.tapes.size), go::catalog)
+                    InfoRow(Icons.Rounded.Style, stringResource(R.string.card_title), T.plural(c, R.plurals.stamps, h.returned.size), go::card)
+                    InfoRow(Icons.Rounded.Inventory2, stringResource(R.string.bin_title), stringResource(R.string.bin_count, h.bin.size, h.bleached.size), go::bin)
+                }
             }
             Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
         }
@@ -211,6 +218,8 @@ private fun Aisle(title: String, tapes: List<Tape>, h: Home, go: Go, hand: Boole
                     TapeBox(t, rememberCover(t.cover), fade = h.fade(t), wear = h.wear(t), sticker = if (h.watched(t) == 0 && t.readyAt > h.now - 7 * Rules.DAY && tag == null) stringResource(R.string.sticker_new) else null)
                     Spacer(Modifier.height(6.dp))
                     Text(tag?.invoke(t) ?: t.title, style = UType.Small.copy(color = if (tag != null) U.c.cyan else U.c.muted), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    val stars = h.stars(t)
+                    if (stars > 0 && tag == null) Stars(stars, Modifier.padding(top = 3.dp), size = 12.dp, color = U.c.amber)
                 }
             }
         }

@@ -34,6 +34,7 @@ import app.rewind.ui.add.AddScreen
 import app.rewind.ui.add.SearchScreen
 import app.rewind.ui.bin.BinScreen
 import app.rewind.ui.card.CardScreen
+import app.rewind.ui.catalog.CatalogScreen
 import app.rewind.ui.components.rememberNow
 import app.rewind.ui.mystery.MysteryScreen
 import app.rewind.ui.onboarding.WelcomeScreen
@@ -46,6 +47,9 @@ import app.rewind.ui.theme.U
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+
+/** Where a tape is right now. */
+enum class Status { SHELF, OUT, WINDOW, BIN }
 
 /** Why a tape can't go home right now, if it can't. */
 enum class Block { CLOSED, HANDS_FULL, IN_WINDOW, OUT, NONE }
@@ -83,11 +87,31 @@ class Home(
     /** The aisles, each newest first, so what came lately is at hand. */
     fun aisle(k: Kind): List<Tape> = shelf.filter { it.kindOf == k && it.from.isBlank() }.sortedByDescending { it.readyAt }
 
+    /** The store's hits: what got four or five stars, best first. */
+    val hits: List<Tape> = shelf.filter { stars(it) >= 4 }.sortedWith(compareByDescending<Tape> { stars(it) }.thenByDescending { rated(it)?.backAt ?: 0 })
+
     /** Friends' picks, by friend, on the shelf or still in the window. */
     val picks: List<Pair<String, List<Tape>>> = shelf.filter { it.from.isNotBlank() }
         .groupBy { it.from.trim() }.toList().sortedByDescending { (_, l) -> l.maxOf { it.readyAt } }
 
     fun watched(t: Tape) = rentals(t.id).count { it.outcomeOf == Outcome.WATCHED }
+    fun taken(t: Tape) = rentals(t.id).size
+
+    /** The latest slip with stars on it: how it went, last time. */
+    fun rated(t: Tape): Rental? = rentals(t.id).firstOrNull { !it.out && it.stars > 0 }
+    fun stars(t: Tape): Int = rated(t)?.stars ?: 0
+
+    /** The latest slip at all, the one a second thought about the stars goes on. */
+    fun lastSlip(t: Tape): Rental? = rentals(t.id).firstOrNull { !it.out }
+
+    fun touched(t: Tape) = Rules.touched(t, rentals(t.id), now)
+
+    fun status(t: Tape): Status = when {
+        isOut(t) -> Status.OUT
+        t.placeOf == Place.BIN -> Status.BIN
+        t.readyAt > now -> Status.WINDOW
+        else -> Status.SHELF
+    }
     fun wear(t: Tape) = Rules.wear(watched(t))
     fun fade(t: Tape) = if (isOut(t) || t.placeOf == Place.BIN) 0f else Rules.fade(Rules.touched(t, rentals(t.id), now), now)
 
@@ -120,6 +144,7 @@ class Go(private val nav: NavHostController) {
     fun giveBack(rental: Long) = nav.navigate("return/$rental") { launchSingleTop = true }
     fun mystery() = nav.navigate("mystery") { launchSingleTop = true }
     fun card() = nav.navigate("card") { launchSingleTop = true }
+    fun catalog() = nav.navigate("catalog") { launchSingleTop = true }
     fun bin() = nav.navigate("bin") { launchSingleTop = true }
     fun settings() = nav.navigate("settings") { launchSingleTop = true }
     fun back() { nav.popBackStack() }
@@ -177,6 +202,7 @@ fun RewindRoot(settings: Settings) {
             composable("return/{id}", arguments = id) { e -> ReturnScreen(e.arguments?.getLong("id") ?: 0L, home, go) }
             composable("mystery") { MysteryScreen(home, go) }
             composable("card") { CardScreen(home, go) }
+            composable("catalog") { CatalogScreen(home, go) }
             composable("bin") { BinScreen(home, go) }
             composable("settings") { SettingsScreen(home, go) }
         }

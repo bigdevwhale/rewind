@@ -1,6 +1,8 @@
 package app.rewind.data
 
 import android.content.Context
+import androidx.room.AutoMigration
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -17,13 +19,14 @@ import kotlinx.coroutines.flow.Flow
 /**
  * What a tape is, and so how it looks on the shelf and how long it can stay out: a film on a VHS
  * for two evenings, a series box set for a week, an album on an audio cassette for two evenings, a
- * book from the library corner for two weeks.
+ * book from the library corner for two weeks, a comic from the spinner rack for three days.
  */
 enum class Kind(val loanHours: Int, val minutes: Int) {
     FILM(48, 110),
     SERIES(7 * 24, 45),
     ALBUM(48, 45),
-    BOOK(14 * 24, 300);
+    BOOK(14 * 24, 300),
+    COMIC(72, 60);
 
     companion object {
         fun of(s: String) = entries.firstOrNull { it.name == s } ?: FILM
@@ -89,8 +92,8 @@ enum class Outcome {
 
 /**
  * One rent: taken at [outAt], due at [dueAt], back at [backAt] (0 while out). The return slip is
- * [words] (three of them), [scene] (the one moment that stayed) and, for a rewound tape, [note].
- * [mystery]: it came wrapped in brown paper, picked by the clerk.
+ * [words] (three of them), [scene] (the one moment that stayed), [stars] (1 to 5, 0 for none) and,
+ * for a rewound tape, [note]. [mystery]: it came wrapped in brown paper, picked by the clerk.
  */
 @Entity(tableName = "rentals", indices = [Index("tapeId")])
 data class Rental(
@@ -104,6 +107,7 @@ data class Rental(
     val scene: String = "",
     val note: String = "",
     val mystery: Boolean = false,
+    @ColumnInfo(defaultValue = "0") val stars: Int = 0,
 ) {
     val out: Boolean get() = backAt == 0L
     val outcomeOf: Outcome? get() = if (out) null else Outcome.of(outcome)
@@ -146,6 +150,9 @@ interface StoreDao {
     @Update
     suspend fun update(r: Rental)
 
+    @Query("UPDATE rentals SET stars = :stars WHERE id = :id")
+    suspend fun rate(id: Long, stars: Int)
+
     @Query("DELETE FROM rentals WHERE id = :id")
     suspend fun deleteRental(id: Long)
 
@@ -163,7 +170,7 @@ interface StoreDao {
     }
 }
 
-@Database(entities = [Tape::class, Rental::class], version = 1, exportSchema = true)
+@Database(entities = [Tape::class, Rental::class], version = 2, exportSchema = true, autoMigrations = [AutoMigration(from = 1, to = 2)])
 abstract class StoreDatabase : RoomDatabase() {
     abstract fun dao(): StoreDao
 

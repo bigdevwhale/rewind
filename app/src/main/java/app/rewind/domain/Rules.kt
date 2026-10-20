@@ -77,7 +77,7 @@ object Rules {
 
 /** How much time there is tonight, for the tape in brown paper. */
 enum class Time {
-    /** An hour or so: an album, an episode, a chapter, a short film. */
+    /** An hour or so: an album, an episode, a chapter, a comic, a short film. */
     SHORT,
 
     /** An evening: anything up to two and a half hours. */
@@ -87,8 +87,8 @@ enum class Time {
     LONG;
 
     fun fits(t: Tape): Boolean = when (this) {
-        SHORT -> t.kindOf == Kind.SERIES || t.kindOf == Kind.BOOK || t.length <= 60
-        EVENING -> t.kindOf == Kind.SERIES || t.kindOf == Kind.BOOK || t.length <= 150
+        SHORT -> t.kindOf in setOf(Kind.SERIES, Kind.BOOK, Kind.COMIC) || t.length <= 60
+        EVENING -> t.kindOf in setOf(Kind.SERIES, Kind.BOOK, Kind.COMIC) || t.length <= 150
         LONG -> true
     }
 }

@@ -42,12 +42,12 @@
 
     <!-- Welcome -->
     <string name="welcome_title">There’s too much to watch. So nothing gets watched.</string>
-    <string name="welcome_sub">Every film, series, album and book ever made, one tap away, and an evening lost scrolling through them. Films used to be loved because there were few: a Friday walk to the rental store, one tape chosen, two days to bring it back. This is that store, and its shelves are your own list.</string>
+    <string name="welcome_sub">Every film, series, album, book and comic ever made, one tap away, and an evening lost scrolling through them. Films used to be loved because there were few: a Friday walk to the rental store, one tape chosen, two days to bring it back. This is that store, and its shelves are your own list.</string>
     <string name="rules_title">House rules</string>
     <string name="rule_two">Two tapes at a time</string>
     <string name="rule_two_sub">Bring one back to take another. Nothing hangs about half‑watched.</string>
     <string name="rule_due">Due back</string>
-    <string name="rule_due_sub">A film or an album for two evenings, a series for a week, a book for two weeks. Rewind it before it goes back, and write three words on the slip.</string>
+    <string name="rule_due_sub">A film or an album for two evenings, a comic for three days, a series for a week, a book for two weeks. Rewind it before it goes back, and write three words on the slip.</string>
     <string name="rule_hours">Evening hours</string>
     <string name="rule_hours_sub">Open from 6 pm on weekdays and from noon at the weekend, until 11. No choosing at three in the morning.</string>
     <string name="rule_window">New in the window</string>
@@ -88,7 +88,7 @@
     <string name="picks_of">%s recommends</string>
     <string name="sticker_new">NEW</string>
     <string name="empty_title">Nothing on the shelves yet</string>
-    <string name="empty_sub">Find a title in the catalogue, share one from Kinopoisk, IMDb, Spotify or Goodreads, or type it in.</string>
+    <string name="empty_sub">Find a title in the catalogue, share one from Kinopoisk, IMDb, Spotify, Goodreads or MyAnimeList, or type it in.</string>
     <string name="bin_title">Bargain bin</string>
     <string name="card_short">Member card</string>
     <string name="card_title">Member card</string>
@@ -130,7 +130,7 @@
     <string name="put_on_shelf">Put it in the store</string>
     <string name="search_hint">Title, in any language</string>
     <string name="search_none">Nothing found. Try another spelling, or type it in by hand.</string>
-    <string name="search_sources">Films and series from Wikidata and Wikipedia, series also from TVmaze, albums and books from Apple’s iTunes catalogue. Searching is the only thing that goes online.</string>
+    <string name="search_sources">Films and series from Wikidata and Wikipedia, series also from TVmaze, albums from Apple’s iTunes, books and comics from Wikidata and iTunes. Searching is the only thing that goes online.</string>
 
     <!-- Receipt -->
     <string name="receipt_head">VIDEO · AUDIO · BOOKS</string>
@@ -229,4 +229,58 @@
     <string name="n_late_text">No harm done. Bring it back when you’re ready.</string>
     <string name="n_shelf_title">“%s” is on the shelf</string>
     <string name="n_shelf_text">Out of the window and ready to take home.</string>
+    <string name="kind_comic">Comic</string>
+    <string name="aisle_comic">Comics</string>
+    <string name="loan_three_days">3 days</string>
+    <plurals name="cards">
+        <item quantity="one">%d card</item>
+        <item quantity="other">%d cards</item>
+    </plurals>
+    <plurals name="stamps">
+        <item quantity="one">%d stamp</item>
+        <item quantity="other">%d stamps</item>
+    </plurals>
+    <string name="hits_title">Store hits · four stars and up</string>
+    <string name="more_title">Also in the store</string>
+    <string name="bin_count">%1$d marked down · %2$d fading</string>
+    <string name="slip_stars">STARS</string>
+    <string name="no_stars">no stars yet</string>
+    <string name="taken_n">taken %s</string>
+    <string name="catalog_title">Card catalogue</string>
+    <string name="catalog_search">Title, maker, who recommended…</string>
+    <string name="catalog_sort">Sort</string>
+    <string name="catalog_empty">No cards like that in the drawer.</string>
+    <string name="sort_title">A–Z</string>
+    <string name="sort_rating">Stars</string>
+    <string name="sort_taken">Most taken</string>
+    <string name="sort_newest">Newest</string>
+    <string name="sort_waiting">Waiting longest</string>
+    <string name="sort_year">Year</string>
+    <string name="sort_length">Length</string>
+    <string name="show_all">Everything</string>
+    <string name="show_shelf">On the shelf</string>
+    <string name="show_out">At home</string>
+    <string name="show_window">In the window</string>
+    <string name="show_never">Never taken</string>
+    <string name="show_seen">Seen through</string>
+    <string name="show_bin">In the bin</string>
+    <string name="sec_no_stars">No stars</string>
+    <string name="sec_never">Never taken</string>
+    <string name="sec_once">Once</string>
+    <string name="sec_few">A few times</string>
+    <string name="sec_many">Five times and more</string>
+    <string name="sec_out">At home now</string>
+    <string name="sec_bleached">Bleached</string>
+    <string name="sec_fading">Fading</string>
+    <string name="sec_fresh">Fresh</string>
+    <string name="sec_decade">%ds</string>
+    <string name="sec_no_year">No year</string>
+    <string name="sec_short">About an hour</string>
+    <string name="sec_evening">An evening</string>
+    <string name="sec_long">Long</string>
+    <string name="st_out">AT
+HOME</string>
+    <string name="st_window">IN THE
+WINDOW</string>
+    <string name="st_bin">BIN</string>
 </resources>

@@ -50,11 +50,14 @@ class Store(private val context: Context, private val db: StoreDatabase, private
     }
 
     /** Back over the counter, with its slip. */
-    suspend fun giveBack(rentalId: Long, outcome: Outcome, words: String, scene: String, note: String) {
+    suspend fun giveBack(rentalId: Long, outcome: Outcome, words: String, scene: String, note: String, stars: Int) {
         val r = dao.rental(rentalId) ?: return
-        dao.update(r.copy(backAt = System.currentTimeMillis(), outcome = outcome.name, words = words.trim(), scene = scene.trim(), note = note.trim()))
+        dao.update(r.copy(backAt = System.currentTimeMillis(), outcome = outcome.name, words = words.trim(), scene = scene.trim(), note = note.trim(), stars = stars))
         Reminders.schedule(context)
     }
+
+    /** A second thought about a tape: the stars on its latest slip change. */
+    suspend fun rate(rentalId: Long, stars: Int) = dao.rate(rentalId, stars.coerceIn(0, 5))
 
     /** Taken by mistake, a moment ago: back on the shelf as if it never left. */
     suspend fun undoRent(rentalId: Long) {
