@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rewind</string>
+    <string name="settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="saving">Putting it out…</string>
+    <string name="edit">Edit</string>
+    <string name="next">Next</string>
+    <string name="off">Off</string>
+    <string name="today">today</string>
+    <string name="tomorrow">tomorrow</string>
+    <string name="minutes_short">%d min</string>
+    <string name="hours_only">%d h</string>
+    <string name="hours_short">%1$d h %2$d min</string>
+    <string name="hours_left">%d h</string>
+    <plurals name="days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <plurals name="times">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d times</item>
+    </plurals>
+    <plurals name="tapes">
+        <item quantity="one">%d tape</item>
+        <item quantity="other">%d tapes</item>
+    </plurals>
+
+    <string name="kind_film">Film</string>
+    <string name="kind_series">Series</string>
+    <string name="kind_album">Album</string>
+    <string name="kind_book">Book</string>
+    <string name="aisle_film">Films</string>
+    <string name="aisle_series">Series</string>
+    <string name="aisle_album">Music</string>
+    <string name="aisle_book">Books</string>
+    <string name="loan_two_days">2 evenings</string>
+    <string name="loan_week">a week</string>
+    <string name="loan_two_weeks">2 weeks</string>
+
+    <!-- Welcome -->
+    <string name="welcome_title">There’s too much to watch. So nothing gets watched.</string>
+    <string name="welcome_sub">Every film, series, album and book ever made, one tap away, and an evening lost scrolling through them. Films used to be loved because there were few: a Friday walk to the rental store, one tape chosen, two days to bring it back. This is that store, and its shelves are your own list.</string>
+    <string name="rules_title">House rules</string>
+    <string name="rule_two">Two tapes at a time</string>
+    <string name="rule_two_sub">Bring one back to take another. Nothing hangs about half‑watched.</string>
+    <string name="rule_due">Due back</string>
+    <string name="rule_due_sub">A film or an album for two evenings, a series for a week, a book for two weeks. Rewind it before it goes back, and write three words on the slip.</string>
+    <string name="rule_hours">Evening hours</string>
+    <string name="rule_hours_sub">Open from 6 pm on weekdays and from noon at the weekend, until 11. No choosing at three in the morning.</string>
+    <string name="rule_window">New in the window</string>
+    <string name="rule_window_sub">A new tape waits a few days behind the glass before it reaches the shelf. If you still want it then, it was yours.</string>
+    <string name="rule_wrapped">Wrapped in brown paper</string>
+    <string name="rule_wrapped_sub">Can’t choose? Tell the clerk how much time you have and get a tape you can’t see.</string>
+    <string name="rule_bin">The bargain bin</string>
+    <string name="rule_bin_sub">Boxes nobody takes fade in the sun. The clerk offers to mark them down, guilt‑free; from the bin they can still be rescued.</string>
+    <string name="open_store">Open the store</string>
+    <string name="welcome_free">Free, no ads, no account. Your list stays on the phone.</string>
+
+    <!-- The store -->
+    <string name="sign_open">OPEN</string>
+    <string name="sign_closed">CLOSED</string>
+    <string name="hours_always">Open round the clock</string>
+    <string name="hours_until">Open until %s</string>
+    <string name="hours_opens_today">Opens today at %s</string>
+    <string name="hours_opens_tomorrow">Opens at %s</string>
+    <string name="clerk">Clerk</string>
+    <string name="clerk_empty">Empty shelves, a new store. Bring in the first tape: whatever you keep meaning to watch, hear or read.</string>
+    <string name="clerk_closed">We’re closed. Come back at %s; the tapes will wait.</string>
+    <string name="clerk_full">Both hands full. Bring one back first.</string>
+    <string name="clerk_late">“%s” is overdue. No rush, but don’t forget it.</string>
+    <string name="clerk_bleached">“%s” has faded in the window. Mark it down?</string>
+    <string name="clerk_soon">“%s” comes out of the window tomorrow.</string>
+    <string name="clerk_idle">Quiet evening. Something from the shelf, or let me wrap you one?</string>
+    <string name="clerk_one_more">One more fits in your bag.</string>
+    <string name="at_home">At home · %1$d of %2$d</string>
+    <string name="due_in">due in %s</string>
+    <string name="late_by">late by %s</string>
+    <string name="give_back">Bring it back</string>
+    <string name="free_hand">A free hand</string>
+    <string name="bring_in">Bring in a tape</string>
+    <string name="bring_in_short">Bring in</string>
+    <string name="wrapped">Wrapped</string>
+    <string name="window_title">Coming soon · in the window</string>
+    <string name="window_in">in %s</string>
+    <string name="picks_of">%s recommends</string>
+    <string name="sticker_new">NEW</string>
+    <string name="empty_title">Nothing on the shelves yet</string>
+    <string name="empty_sub">Find a title in the catalogue, share one from Kinopoisk, IMDb, Spotify or Goodreads, or type it in.</string>
+    <string name="bin_title">Bargain bin</string>
+    <string name="card_short">Member card</string>
+    <string name="card_title">Member card</string>
+
+    <!-- A tape -->
+    <string name="loan_for">For %s</string>
+    <string name="seen_times">Taken home %s</string>
+    <string name="back_of_box">The back of the box</string>
+    <string name="back_blank">Nothing written yet. Why did you want this one?</string>
+    <string name="open_link">Open where it lives</string>
+    <string name="slips">Return slips</string>
+    <string name="mark_down">Mark it down</string>
+    <string name="take_home">Take it home</string>
+    <string name="why_closed">Closed now. Opens at %s</string>
+    <string name="why_closed_short">The store is closed now.</string>
+    <string name="why_full">Both hands full: bring one back first</string>
+    <string name="why_window">In the window for %s more</string>
+    <string name="in_bin_note">From the bargain bin: taking it puts it back on the shelf.</string>
+    <string name="recommend">Recommend to a friend</string>
+    <string name="slip_wrapped">WRAPPED</string>
+    <string name="stamp_back">BACK</string>
+    <string name="stamp_late">LATE</string>
+    <string name="stamp_rewound">REW</string>
+
+    <!-- Bring in -->
+    <string name="find_in_catalog">Find in the catalogue</string>
+    <string name="f_title">Title</string>
+    <string name="f_director">Director</string>
+    <string name="f_network">Channel</string>
+    <string name="f_artist">Artist</string>
+    <string name="f_author">Author</string>
+    <string name="f_year">Year</string>
+    <string name="f_minutes">Minutes</string>
+    <string name="back_hint">In your own words: why is it worth taking? You’ll read this months from now, deciding.</string>
+    <string name="f_blurb">Why this one</string>
+    <string name="f_from">Who recommended it</string>
+    <string name="from_hint">Friends’ picks get a shelf of their own.</string>
+    <string name="window_note">It’ll wait in the window for %s, then go on the shelf.</string>
+    <string name="put_on_shelf">Put it in the store</string>
+    <string name="search_hint">Title, in any language</string>
+    <string name="search_none">Nothing found. Try another spelling, or type it in by hand.</string>
+    <string name="search_sources">Films and series from Wikidata and Wikipedia, series also from TVmaze, albums and books from Apple’s iTunes catalogue. Searching is the only thing that goes online.</string>
+
+    <!-- Receipt -->
+    <string name="receipt_head">VIDEO · AUDIO · BOOKS</string>
+    <string name="receipt_item">ITEM</string>
+    <string name="receipt_kind">TYPE</string>
+    <string name="receipt_out">OUT</string>
+    <string name="receipt_due">DUE</string>
+    <string name="receipt_price">PRICE</string>
+    <string name="receipt_free">0.00</string>
+    <string name="be_kind">BE KIND, PLEASE REWIND</string>
+    <string name="receipt_foot">Thank you. Enjoy your evening.</string>
+    <string name="receipt_done">Off home</string>
+    <string name="receipt_undo">Took it by mistake: put it back</string>
+
+    <!-- Return -->
+    <string name="return_on_time">On time. Thank you.</string>
+    <string name="return_late">Late by %s. It happens.</string>
+    <string name="out_watched">Watched it</string>
+    <string name="out_heard">Heard it</string>
+    <string name="out_read">Read it</string>
+    <string name="out_rewound">Not finished</string>
+    <string name="rewind_title">Be kind, rewind</string>
+    <string name="rewind_hint">Turn a reel anticlockwise with a finger, or hold REW.</string>
+    <string name="rewound_done">Rewound. Ready to go back.</string>
+    <string name="slip_title">The return slip</string>
+    <string name="f_words">Three words</string>
+    <string name="f_scene">The moment that stayed</string>
+    <string name="f_why_not">Why it didn’t go</string>
+    <string name="slip_hint">All optional. Stays with the tape.</string>
+    <string name="rewind_first">Rewind it first</string>
+    <string name="hand_in">Hand it in</string>
+
+    <!-- Wrapped -->
+    <string name="wrap_clerk">Can’t choose? Tell me how much time you have, and I’ll wrap you something from the shelf.</string>
+    <string name="wrap_time">How much time</string>
+    <string name="wrap_kind">What kind</string>
+    <string name="wrap_any">Anything</string>
+    <string name="time_short">About an hour</string>
+    <string name="time_evening">An evening</string>
+    <string name="time_long">All the time in the world</string>
+    <string name="wrap_ask">Wrap me one</string>
+    <string name="wrap_none">Nothing on the shelf fits. Try other answers.</string>
+    <string name="wrap_hint">%1$s · %2$s</string>
+    <string name="wrap_tear">Tap to tear the paper.</string>
+    <string name="wrap_again">Wrap another</string>
+
+    <!-- Member card -->
+    <string name="card_member">MEMBER</string>
+    <string name="card_no_name">(your name, in settings)</string>
+    <string name="stat_taken">taken</string>
+    <string name="stat_seen">seen</string>
+    <string name="stat_rewound">rewound</string>
+    <string name="stat_late">late</string>
+    <string name="hit_month">Hit of the month</string>
+    <string name="hit_last_month">Last month’s hit</string>
+    <string name="slips_recent">Latest slips</string>
+    <string name="roll_title">%d on a till roll</string>
+    <string name="roll_total">TOTAL</string>
+
+    <!-- Bargain bin -->
+    <string name="bin_clerk">These have waited too long. Marking them down isn’t giving up; it makes room. From the bin you can still take one home.</string>
+    <string name="bin_clerk_empty">Nothing faded, nothing marked down. Everything on the shelves still gets taken.</string>
+    <string name="bin_bleached">Faded in the window</string>
+    <string name="bin_in">In the bin</string>
+    <string name="bin_since">Marked down %s</string>
+    <string name="rescue">Rescue</string>
+    <string name="throw_out">Throw out</string>
+    <string name="throw_title">Throw out “%s”?</string>
+    <string name="throw_text">It leaves the store for good, with its slips.</string>
+
+    <!-- Settings -->
+    <string name="s_hours">Opening hours</string>
+    <string name="s_hours_on">Evening hours</string>
+    <string name="s_hours_on_sub">Off, the store never closes.</string>
+    <string name="s_weekday">Opens on weekdays</string>
+    <string name="s_weekend">Opens at the weekend</string>
+    <string name="s_close">Closes</string>
+    <string name="s_window">The window</string>
+    <string name="s_window_sub">How long a new tape waits behind the glass before it reaches the shelf.</string>
+    <string name="s_reminders">Reminders</string>
+    <string name="s_reminders_on">Nudges from the store</string>
+    <string name="s_reminders_sub">A few hours before a tape is due, if it’s late, and when one leaves the window.</string>
+    <string name="s_name">Your name</string>
+    <string name="s_name_sub">On your member card, and signed under tapes you recommend to friends.</string>
+    <string name="s_name_field">Name</string>
+    <string name="s_language">Language</string>
+    <string name="s_lang_system">System</string>
+    <string name="s_about">About</string>
+    <string name="s_about_text">Rewind doesn’t stream or sell anything: it’s the store, and the tapes are your own list. Watch, listen and read wherever you already do. Everything stays on the phone; only the catalogue search goes online. Free and open source, MIT.</string>
+
+    <!-- Notifications -->
+    <string name="n_channel">The store</string>
+    <string name="n_due_title">“%s” is due back</string>
+    <string name="n_due_text">Due at %s. Rewind it, and bring it back.</string>
+    <string name="n_late_title">“%s” is late</string>
+    <string name="n_late_text">No harm done. Bring it back when you’re ready.</string>
+    <string name="n_shelf_title">“%s” is on the shelf</string>
+    <string name="n_shelf_text">Out of the window and ready to take home.</string>
+</resources>

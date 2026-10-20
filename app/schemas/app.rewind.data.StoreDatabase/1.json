@@ -1,0 +1,205 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "437f85f037c0a38c4cbea9f45e8d05a6",
+    "entities": [
+      {
+        "tableName": "tapes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `kind` TEXT NOT NULL, `title` TEXT NOT NULL, `creator` TEXT NOT NULL, `year` INTEGER, `minutes` INTEGER, `blurb` TEXT NOT NULL, `from` TEXT NOT NULL, `seed` INTEGER NOT NULL, `addedAt` INTEGER NOT NULL, `readyAt` INTEGER NOT NULL, `place` TEXT NOT NULL, `binAt` INTEGER NOT NULL, `link` TEXT, `cover` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creator",
+            "columnName": "creator",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "minutes",
+            "columnName": "minutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "blurb",
+            "columnName": "blurb",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "from",
+            "columnName": "from",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seed",
+            "columnName": "seed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addedAt",
+            "columnName": "addedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "readyAt",
+            "columnName": "readyAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "place",
+            "columnName": "place",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "binAt",
+            "columnName": "binAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "link",
+            "columnName": "link",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "cover",
+            "columnName": "cover",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_tapes_place",
+            "unique": false,
+            "columnNames": [
+              "place"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tapes_place` ON `${TABLE_NAME}` (`place`)"
+          }
+        ]
+      },
+      {
+        "tableName": "rentals",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tapeId` INTEGER NOT NULL, `outAt` INTEGER NOT NULL, `dueAt` INTEGER NOT NULL, `backAt` INTEGER NOT NULL, `outcome` TEXT NOT NULL, `words` TEXT NOT NULL, `scene` TEXT NOT NULL, `note` TEXT NOT NULL, `mystery` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tapeId",
+            "columnName": "tapeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "outAt",
+            "columnName": "outAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dueAt",
+            "columnName": "dueAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "backAt",
+            "columnName": "backAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "outcome",
+            "columnName": "outcome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "words",
+            "columnName": "words",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scene",
+            "columnName": "scene",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mystery",
+            "columnName": "mystery",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_rentals_tapeId",
+            "unique": false,
+            "columnNames": [
+              "tapeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_rentals_tapeId` ON `${TABLE_NAME}` (`tapeId`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '437f85f037c0a38c4cbea9f45e8d05a6')"
+    ]
+  }
+}
