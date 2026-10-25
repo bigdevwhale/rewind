@@ -43,6 +43,7 @@ import app.rewind.ui.Go
 import app.rewind.ui.Home
 import app.rewind.ui.Language
 import app.rewind.ui.T
+import app.rewind.ui.components.CommunityLinks
 import app.rewind.ui.components.Field
 import app.rewind.ui.components.SectionTitle
 import app.rewind.ui.components.Segmented
@@ -99,8 +100,7 @@ fun SettingsScreen(h: Home, go: Go) {
                     else -> stringResource(R.string.s_lang_system)
                 }
             }, { Language.set(it) })
-            SectionTitle(stringResource(R.string.s_about))
-            Text(stringResource(R.string.s_about_text), style = UType.Muted)
+            CommunityLinks()
             Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars).height(28.dp))
         }
     }
