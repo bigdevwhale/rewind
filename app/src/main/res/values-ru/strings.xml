@@ -132,7 +132,7 @@
     <string name="put_on_shelf">Выставить в прокат</string>
     <string name="search_hint">Название, на любом языке</string>
     <string name="search_none">Ничего не нашлось. Попробуй написать иначе или впиши вручную.</string>
-    <string name="search_sources">Фильмы и сериалы из Wikidata и Википедии, сериалы ещё из TVmaze, альбомы из iTunes, книги и комиксы из Wikidata и iTunes, аниме и манга из MyAnimeList (через Jikan) и Wikidata. В интернет приложение ходит только ради поиска.</string>
+    <string name="search_sources">Фильмы и сериалы из Wikidata и Википедии, сериалы ещё из TVmaze, альбомы из iTunes, книги и комиксы из Wikidata и iTunes, аниме и манга из Шикимори, AniList, Wikidata и MyAnimeList. В интернет приложение ходит только ради поиска.</string>
 
     <string name="receipt_head">ВИДЕО · АУДИО · КНИГИ</string>
     <string name="receipt_item">ТОВАР</string>

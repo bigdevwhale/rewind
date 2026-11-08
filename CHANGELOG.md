@@ -10,14 +10,14 @@ then close it like any HTML comment. The release notes carry it, and the chat bo
 
 ### Added
 - **Your own cover** (#1): on a tape's page, or in the form when bringing one in, pick a picture from the gallery through the system photo picker (no storage permission). It's scaled down and kept in the app, shown wherever the box stands instead of the catalogue's picture, and can be swapped or dropped to go back to the catalogue cover.
-- **Anime and manga** (#2): two new kinds with their own aisles. Anime comes on a Japanese VHS with its obi and goes out for a week, like a series; manga is a tankōbon with a volume number and goes out for three days, like a comic. The catalogue finds them through Jikan (MyAnimeList) and Wikidata, with the original title, episodes or volumes in the results; MyAnimeList, Shikimori and AniList links shared in land on the right shelf.
+- **Anime and manga** (#2): two new kinds with their own aisles. Anime comes on a Japanese VHS with its obi and goes out for a week, like a series; manga is a tankōbon with a volume number and goes out for three days, like a comic. The catalogue finds them through Shikimori (with Russian titles), AniList and Wikidata, with Jikan (MyAnimeList) as a last resort, with the original title, episodes or volumes in the results; MyAnimeList, Shikimori and AniList links shared in land on the right shelf.
 
 ### Changed
 - The kind picker in the form and the search wraps onto two lines, now that there are seven kinds.
 
 <!-- tg
 Свою обложку теперь можно поставить на любую кассету: выбери картинку из галереи на странице кассеты или при добавлении.
-Новые полки: аниме и манга. Ищутся в каталоге MyAnimeList, аниме берут на неделю, мангу на три дня.
+Новые полки: аниме и манга. Ищутся в Шикимори и AniList, аниме берут на неделю, мангу на три дня.
 -->
 
 ## [1.0.1] - 2026-10-25

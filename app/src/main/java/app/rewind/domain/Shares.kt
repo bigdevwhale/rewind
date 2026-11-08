@@ -88,8 +88,8 @@ object Shares {
     fun kindOf(link: String): Kind? {
         val l = link.lowercase()
         return when {
-            listOf("myanimelist.net/manga", "shikimori.one/mangas", "shikimori.me/mangas", "anilist.co/manga", "mangalib", "remanga").any { it in l } -> Kind.MANGA
-            listOf("myanimelist.net/anime", "shikimori.one/animes", "shikimori.me/animes", "anilist.co/anime", "animego", "crunchyroll").any { it in l } -> Kind.ANIME
+            listOf("myanimelist.net/manga", "shikimori.io/mangas", "shikimori.one/mangas", "shikimori.me/mangas", "anilist.co/manga", "mangalib", "remanga").any { it in l } -> Kind.MANGA
+            listOf("myanimelist.net/anime", "shikimori.io/animes", "shikimori.one/animes", "shikimori.me/animes", "anilist.co/anime", "animego", "crunchyroll").any { it in l } -> Kind.ANIME
             listOf("comicvine", "comixology", "webtoons", "marvel.com/comics").any { it in l } -> Kind.COMIC
             listOf("/series/", "myshows.me", "tvmaze").any { it in l } -> Kind.SERIES
             listOf("kinopoisk", "imdb.com", "letterboxd", "ivi.ru", "okko.tv", "themoviedb").any { it in l } -> Kind.FILM

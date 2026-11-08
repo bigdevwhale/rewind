@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import app.rewind.domain.Draft
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -26,8 +28,8 @@ import java.util.UUID
  * Looking a title up, so a tape comes in with its cover, year, maker and length. All free and
  * keyless: films and series from Wikidata (posters from Wikipedia), series also from TVmaze, albums
  * from Apple's iTunes Search, books and comics from Wikidata and iTunes, anime and manga from
- * Jikan (MyAnimeList) and Wikidata. This is the only thing that goes online, and only when someone
- * searches.
+ * Shikimori, AniList and Wikidata (with Jikan, the MyAnimeList API, as a last resort). This is the
+ * only thing that goes online, and only when someone searches.
  */
 object Catalog {
     private const val AGENT = "Rewind/1.0 (https://github.com/bigdevwhale/rewind)"
@@ -50,34 +52,62 @@ object Catalog {
                 Kind.ALBUM -> listOf(async { itunes(q, kind, ru) })
                 Kind.BOOK -> listOf(async { wikidata(q, kind, books, ru) }, async { itunes(q, kind, ru) })
                 Kind.COMIC -> listOf(async { wikidata(q, kind, comics, ru) }, async { itunes(q, kind, ru) })
-                // MyAnimeList knows every title but only in English and romaji; Wikidata has the Russian names.
-                Kind.ANIME -> listOf(async { jikan(q, kind) }, async { wikidata(q, kind, anime, ru) }).let { if (ru) it.reversed() else it }
-                Kind.MANGA -> listOf(async { jikan(q, kind) }, async { wikidata(q, kind, manga, ru) }).let { if (ru) it.reversed() else it }
+                // Shikimori has the Russian titles, AniList the English ones; Jikan is often down, so it comes last.
+                Kind.ANIME, Kind.MANGA -> {
+                    val shiki = async { shikimori(q, kind, ru) }
+                    val wiki = async { wikidata(q, kind, if (kind == Kind.ANIME) anime else manga, ru) }
+                    val ani = async { anilist(q, kind) }
+                    // Outside this scope, so a hanging Jikan never holds the search: it's waited for
+                    // only when the others found nothing, and otherwise taken only if already back.
+                    val jikanCall = background.async { jikan(q, kind) }
+                    val mal = async {
+                        val others = listOf(shiki, wiki, ani).awaitAll()
+                        if (others.all { it.isEmpty() } || jikanCall.isCompleted) jikanCall.await() else emptyList()
+                    }
+                    if (ru) listOf(shiki, wiki, ani, mal) else listOf(ani, shiki, wiki, mal)
+                }
             }.awaitAll()
         }
-        // Each source in turn, best first, without the same title twice.
+        // Each source in turn, best first, without the same title twice: in either of its names, as
+        // one source gives the Russian title and another the English.
         val seen = HashSet<String>()
         val merged = ArrayList<Draft>()
         val lists = found.map { it.toMutableList() }
         while (lists.any { it.isNotEmpty() }) for (l in lists) if (l.isNotEmpty()) {
             val d = l.removeAt(0)
-            if (seen.add(d.title.lowercase() + "|" + (d.year ?: ""))) merged += d
+            val keys = listOfNotNull(d.title, d.original).map { it.lowercase() + "|" + (d.year ?: "") }
+            if (keys.none { it in seen }) merged += d
+            seen += keys
         }
         merged.take(16)
     }
 
-    private fun get(url: String): String? = try {
+    private fun get(url: String): String? = http(url).body
+
+    /** An answer: the status (0 when nothing came back at all) and the body of a good one. */
+    private class Reply(val code: Int, val body: String?)
+
+    /** A GET, or with [json] a POST of it; never throws. */
+    private fun http(url: String, json: String? = null, connect: Int = 8_000, read: Int = 10_000): Reply = try {
         val c = URL(url).openConnection() as HttpURLConnection
         c.setRequestProperty("User-Agent", AGENT)
-        c.connectTimeout = 8_000
-        c.readTimeout = 10_000
+        c.connectTimeout = connect
+        c.readTimeout = read
+        if (json != null) {
+            c.requestMethod = "POST"
+            c.doOutput = true
+            c.setRequestProperty("Content-Type", "application/json")
+            c.setRequestProperty("Accept", "application/json")
+            c.outputStream.use { it.write(json.toByteArray()) }
+        }
         try {
-            if (c.responseCode in 200..299) c.inputStream.bufferedReader().readText() else null
+            val code = c.responseCode
+            Reply(code, if (code in 200..299) c.inputStream.bufferedReader().readText() else null)
         } finally {
             c.disconnect()
         }
     } catch (_: Exception) {
-        null
+        Reply(0, null)
     }
 
     private fun enc(s: String) = URLEncoder.encode(s, "UTF-8")
@@ -112,26 +142,109 @@ object Catalog {
         return words.any { it in hay }
     }
 
+    /** For calls the search may stop waiting for. */
+    private val background = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private val jikanGate = Mutex()
     private var jikanLast = 0L
 
     /**
-     * Anime and manga from Jikan, the open MyAnimeList API (#2). It allows about three requests a
-     * second, so calls are spaced out, and a refused one (429) is tried once more a second later.
+     * Anime and manga from Jikan, the open MyAnimeList API (#2), the last resort: it is often down,
+     * so it gets short timeouts and the search doesn't wait long on it. It allows about three
+     * requests a second, so calls are spaced out, and one refused for speed (429) is tried again.
      */
     private suspend fun jikan(q: String, kind: Kind): List<Draft> {
         val what = if (kind == Kind.MANGA) "manga" else "anime"
         val url = "https://api.jikan.moe/v4/$what?q=${enc(q)}&limit=10&sfw=true"
         repeat(2) { attempt ->
-            val body = jikanGate.withLock {
+            val reply = jikanGate.withLock {
                 val wait = jikanLast + 400 - System.currentTimeMillis()
                 if (wait > 0) delay(wait)
-                get(url).also { jikanLast = System.currentTimeMillis() }
+                http(url, connect = 3_000, read = 5_000).also { jikanLast = System.currentTimeMillis() }
             }
-            if (body != null) return runCatching { jikanParse(body, kind) }.getOrDefault(emptyList())
-            if (attempt == 0) delay(1_000)
+            reply.body?.let { return runCatching { jikanParse(it, kind) }.getOrDefault(emptyList()) }
+            if (reply.code != 429 || attempt > 0) return emptyList()
+            delay(1_000)
         }
         return emptyList()
+    }
+
+    private const val SHIKI = "https://shikimori.io"
+    private val shikiGate = Mutex()
+    private var shikiLast = 0L
+
+    /** Anime and manga from Shikimori (#2), with their Russian titles; it asks for at most five requests a second. */
+    private suspend fun shikimori(q: String, kind: Kind, ru: Boolean): List<Draft> {
+        val what = if (kind == Kind.MANGA) "mangas" else "animes"
+        val body = shikiGate.withLock {
+            val wait = shikiLast + 250 - System.currentTimeMillis()
+            if (wait > 0) delay(wait)
+            get("$SHIKI/api/$what?search=${enc(q)}&limit=10").also { shikiLast = System.currentTimeMillis() }
+        } ?: return emptyList()
+        return runCatching { shikimoriParse(body, kind, ru) }.getOrDefault(emptyList())
+    }
+
+    /** Shikimori's list as drafts: the Russian title in Russian, the other one as the original. Its paths are relative. */
+    internal fun shikimoriParse(body: String, kind: Kind, ru: Boolean): List<Draft> {
+        val arr = JSONArray(body)
+        return (0 until arr.length()).mapNotNull { arr.optJSONObject(it) }
+            // Light novels sit among the manga; they're books.
+            .filter { it.str("kind") !in setOf("light_novel", "novel") }
+            .map { o ->
+                val name = o.str("name")
+                val russian = o.str("russian")
+                val title = (if (ru) russian ?: name else name ?: russian) ?: ""
+                Draft(
+                    kind = kind,
+                    title = title,
+                    creator = "",
+                    year = year(o.str(if (kind == Kind.MANGA) "released_on" else "aired_on") ?: o.str("aired_on")),
+                    minutes = null,
+                    link = o.str("url")?.let { if (it.startsWith("http")) it else SHIKI + it },
+                    coverUrl = o.optJSONObject("image")?.str("original")?.takeIf { "missing" !in it }?.let { if (it.startsWith("http")) it else SHIKI + it },
+                    original = listOfNotNull(name, russian).firstOrNull { it != title },
+                    episodes = if (kind == Kind.ANIME) o.optInt("episodes").takeIf { it > 0 } ?: o.optInt("episodes_aired").takeIf { it > 0 } else null,
+                    volumes = if (kind == Kind.MANGA) o.optInt("volumes").takeIf { it > 0 } else null,
+                    chapters = if (kind == Kind.MANGA) o.optInt("chapters").takeIf { it > 0 } else null,
+                )
+            }.filter { it.title.isNotBlank() }
+    }
+
+    private const val ANILIST_QUERY = "query (${'$'}q: String, ${'$'}type: MediaType) { Page(perPage: 10) { media(search: ${'$'}q, type: ${'$'}type, isAdult: false) { " +
+        "title { romaji english native } startDate { year } coverImage { large } siteUrl episodes duration chapters volumes " +
+        "studios(isMain: true) { nodes { name } } staff(perPage: 2) { nodes { name { full } } } } } }"
+
+    /** Anime and manga from AniList's GraphQL (#2): good English titles; 90 requests a minute is plenty for typing. */
+    private suspend fun anilist(q: String, kind: Kind): List<Draft> {
+        val vars = JSONObject().put("q", q).put("type", if (kind == Kind.MANGA) "MANGA" else "ANIME")
+        val body = http("https://graphql.anilist.co", JSONObject().put("query", ANILIST_QUERY).put("variables", vars).toString()).body ?: return emptyList()
+        return runCatching { anilistParse(body, kind) }.getOrDefault(emptyList())
+    }
+
+    internal fun anilistParse(body: String, kind: Kind): List<Draft> {
+        val media = JSONObject(body).optJSONObject("data")?.optJSONObject("Page")?.optJSONArray("media") ?: return emptyList()
+        fun names(o: JSONObject?, pick: (JSONObject) -> String?): List<String> =
+            o?.optJSONArray("nodes")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.let(pick) } }.orEmpty()
+        return (0 until media.length()).mapNotNull { media.optJSONObject(it) }.map { o ->
+            val t = o.optJSONObject("title")
+            val romaji = t?.str("romaji")
+            val title = t?.str("english") ?: romaji ?: ""
+            val creator = if (kind == Kind.MANGA) names(o.optJSONObject("staff")) { it.optJSONObject("name")?.str("full") }
+            else names(o.optJSONObject("studios")) { it.str("name") }
+            Draft(
+                kind = kind,
+                title = title,
+                creator = creator.take(2).joinToString(", "),
+                year = o.optJSONObject("startDate")?.optInt("year")?.takeIf { it > 0 },
+                minutes = if (kind == Kind.ANIME) o.optInt("duration").takeIf { it > 0 } else null,
+                link = o.str("siteUrl"),
+                coverUrl = o.optJSONObject("coverImage")?.str("large"),
+                original = (romaji?.takeIf { it != title } ?: t?.str("native"))?.takeIf { it != title },
+                episodes = if (kind == Kind.ANIME) o.optInt("episodes").takeIf { it > 0 } else null,
+                volumes = if (kind == Kind.MANGA) o.optInt("volumes").takeIf { it > 0 } else null,
+                chapters = if (kind == Kind.MANGA) o.optInt("chapters").takeIf { it > 0 } else null,
+            )
+        }.filter { it.title.isNotBlank() }
     }
 
     /** One page of Jikan results as drafts: the English title if there is one, the original next to it. */

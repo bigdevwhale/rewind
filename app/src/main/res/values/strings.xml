@@ -130,7 +130,7 @@
     <string name="put_on_shelf">Put it in the store</string>
     <string name="search_hint">Title, in any language</string>
     <string name="search_none">Nothing found. Try another spelling, or type it in by hand.</string>
-    <string name="search_sources">Films and series from Wikidata and Wikipedia, series also from TVmaze, albums from Apple’s iTunes, books and comics from Wikidata and iTunes, anime and manga from MyAnimeList (through Jikan) and Wikidata. Searching is the only thing that goes online.</string>
+    <string name="search_sources">Films and series from Wikidata and Wikipedia, series also from TVmaze, albums from Apple’s iTunes, books and comics from Wikidata and iTunes, anime and manga from Shikimori, AniList, Wikidata and MyAnimeList. Searching is the only thing that goes online.</string>
 
     <!-- Receipt -->
     <string name="receipt_head">VIDEO · AUDIO · BOOKS</string>
