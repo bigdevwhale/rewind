@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -50,13 +51,18 @@ import kotlin.math.sin
 import kotlin.math.cos
 import kotlin.math.PI
 
-/** Width over height of each kind's case: a VHS box, a box set, an audio cassette, a library book. */
+/**
+ * Width over height of each kind's case: a VHS box, a box set, a Japanese VHS, an audio cassette, a
+ * library book, a comic, a tankōbon.
+ */
 fun Kind.aspect(): Float = when (this) {
     Kind.FILM -> 0.57f
     Kind.SERIES -> 0.66f
+    Kind.ANIME -> 0.57f
     Kind.ALBUM -> 0.64f
     Kind.BOOK -> 0.68f
     Kind.COMIC -> 0.66f
+    Kind.MANGA -> 0.7f
 }
 
 /**
@@ -79,6 +85,8 @@ fun TapeBox(tape: Tape, cover: ImageBitmap?, modifier: Modifier = Modifier, widt
                 Kind.ALBUM -> Cassette(tape, cover, scheme, w, fade)
                 Kind.BOOK -> Book(tape, cover, scheme, w, fade)
                 Kind.COMIC -> Comic(tape, cover, scheme, w, fade)
+                Kind.ANIME -> AnimeVhs(tape, cover, scheme, w, fade)
+                Kind.MANGA -> Manga(tape, cover, scheme, w, fade)
             }
             // Sun: the colours wash out toward a pale blue-white.
             if (fade > 0f) Box(Modifier.fillMaxSize().background(Color(0xFFE4EEEC).copy(alpha = 0.55f * fade)))
@@ -125,19 +133,75 @@ private fun Small(text: String, color: Color, w: Dp, modifier: Modifier = Modifi
 
 /** A film: a VHS sleeve, the picture with a black band and the format's logo. */
 @Composable
-private fun Vhs(tape: Tape, cover: ImageBitmap?, s: Art.Scheme, w: Dp, fade: Float) {
+private fun Vhs(tape: Tape, cover: ImageBitmap?, s: Art.Scheme, w: Dp, fade: Float, label: String = "VHS · HI-FI", mark: String = "VHS") {
     if (cover != null) {
         Column(Modifier.fillMaxSize()) {
             Picture(cover, fade, Modifier.fillMaxWidth().weight(1f))
             Box(Modifier.fillMaxWidth().background(Color(0xFF0E0E10)).padding(horizontal = w * 0.06f, vertical = w * 0.035f)) {
-                Small("VHS · HI-FI", Color(0xFFE9E4D8), w)
+                Small(label, Color(0xFFE9E4D8), w)
             }
         }
         return
     }
     Drawn(tape, s, w)
     Box(Modifier.fillMaxSize().padding(w * 0.06f)) {
-        Small("VHS", s.ink.copy(alpha = 0.85f), w, Modifier.align(Alignment.TopStart))
+        Small(mark, s.ink.copy(alpha = 0.85f), w, Modifier.align(Alignment.TopStart))
+    }
+}
+
+/**
+ * Anime (#2): a Japanese VHS, the sleeve wrapped in its obi, the paper strip down the side that the
+ * shops there put round every release, red block at the top.
+ */
+@Composable
+private fun AnimeVhs(tape: Tape, cover: ImageBitmap?, s: Art.Scheme, w: Dp, fade: Float) {
+    val obi = w * 0.13f
+    Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().padding(start = obi)) { Vhs(tape, cover, s, w - obi, fade, label = "VHS · ANIME", mark = "ANIME") }
+        Column(Modifier.fillMaxHeight().width(obi).background(Color(0xFFF4F1EA))) {
+            Box(Modifier.fillMaxWidth().weight(0.28f).background(Color(0xFFD7263D)))
+            Box(Modifier.fillMaxWidth().weight(0.72f)) {
+                Canvas(Modifier.fillMaxSize()) {
+                    // Lines of small print down the strip.
+                    val x = size.width / 2
+                    repeat(6) { i -> drawLine(Color(0xFF2A2A2A).copy(alpha = 0.5f), Offset(x, size.height * (0.06f + i * 0.15f)), Offset(x, size.height * (0.15f + i * 0.15f)), 1.5f) }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Manga (#2): a tankōbon, the small paperback volume, with the obi band round its bottom and the
+ * volume number in the corner; a drawn one gets speed lines in black ink.
+ */
+@Composable
+private fun Manga(tape: Tape, cover: ImageBitmap?, s: Art.Scheme, w: Dp, fade: Float) {
+    val paper = Color(0xFFF7F4EC)
+    val ink = Color(0xFF111111)
+    Box(Modifier.fillMaxSize().background(paper)) {
+        if (cover != null) Picture(cover, fade, Modifier.fillMaxSize())
+        else {
+            Canvas(Modifier.fillMaxSize()) {
+                val c = Offset(size.width * 0.5f, size.height * 0.32f)
+                val rnd = Random(tape.seed)
+                repeat(56) { k ->
+                    val a = k * 2 * PI.toFloat() / 56 + rnd.nextFloat() * 0.04f
+                    val r0 = size.width * (0.24f + rnd.nextFloat() * 0.14f)
+                    drawLine(ink, Offset(c.x + cos(a) * r0, c.y + sin(a) * r0), Offset(c.x + cos(a) * size.height, c.y + sin(a) * size.height), 0.8f + rnd.nextFloat() * 1.8f)
+                }
+                drawCircle(s.band, size.width * 0.19f, c)
+            }
+            Box(Modifier.align(Alignment.BottomCenter).padding(start = w * 0.08f, end = w * 0.08f, bottom = w * 0.3f).background(paper).padding(w * 0.03f)) {
+                BoxTitle(tape.title, ink, w * 0.8f, align = TextAlign.Center, lines = 3)
+            }
+        }
+        Box(Modifier.align(Alignment.BottomStart).fillMaxWidth().background(s.accent).padding(horizontal = w * 0.06f, vertical = w * 0.045f)) {
+            Small(tape.creator.ifBlank { "MANGA" }.uppercase(), ink, w)
+        }
+        Box(Modifier.align(Alignment.TopEnd).padding(w * 0.04f).width(w * 0.2f).aspectRatio(1f).clip(CircleShape).background(Color.White), contentAlignment = Alignment.Center) {
+            Text((1 + tape.seed.mod(30L)).toString(), style = TextStyle(fontFamily = Block, fontSize = (w.value * 0.08f).sp, color = ink))
+        }
     }
 }
 

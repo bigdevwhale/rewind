@@ -52,7 +52,7 @@
     <string name="rule_two">Две кассеты на руках</string>
     <string name="rule_two_sub">Чтобы взять новую, верни одну. Ничего не висит недосмотренным.</string>
     <string name="rule_due">Срок возврата</string>
-    <string name="rule_due_sub">Фильм или альбом на два вечера, комикс на три дня, сериал на неделю, книга на две недели. Перед возвратом перемотай кассету и напиши на квитке три слова.</string>
+    <string name="rule_due_sub">Фильм или альбом на два вечера, комикс или манга на три дня, сериал или аниме на неделю, книга на две недели. Перед возвратом перемотай кассету и напиши на квитке три слова.</string>
     <string name="rule_hours">Работаем по вечерам</string>
     <string name="rule_hours_sub">По будням с шести вечера, в выходные с полудня, до одиннадцати. Никакого выбора в три часа ночи.</string>
     <string name="rule_window">Новинки на витрине</string>
@@ -132,7 +132,7 @@
     <string name="put_on_shelf">Выставить в прокат</string>
     <string name="search_hint">Название, на любом языке</string>
     <string name="search_none">Ничего не нашлось. Попробуй написать иначе или впиши вручную.</string>
-    <string name="search_sources">Фильмы и сериалы из Wikidata и Википедии, сериалы ещё из TVmaze, альбомы из iTunes, книги и комиксы из Wikidata и iTunes. В интернет приложение ходит только ради поиска.</string>
+    <string name="search_sources">Фильмы и сериалы из Wikidata и Википедии, сериалы ещё из TVmaze, альбомы из iTunes, книги и комиксы из Wikidata и iTunes, аниме и манга из MyAnimeList (через Jikan) и Wikidata. В интернет приложение ходит только ради поиска.</string>
 
     <string name="receipt_head">ВИДЕО · АУДИО · КНИГИ</string>
     <string name="receipt_item">ТОВАР</string>
@@ -293,4 +293,36 @@
     <string name="community_follow_hint">бот напишет, когда выйдет версия</string>
     <string name="community_chat">Чат StillCraft</string>
     <string name="community_chat_hint">все приложения и люди</string>
+
+    <!-- Аниме и манга (#2) -->
+    <string name="kind_anime">Аниме</string>
+    <string name="kind_manga">Манга</string>
+    <string name="aisle_anime">Аниме</string>
+    <string name="aisle_manga">Манга</string>
+    <string name="f_studio">Студия</string>
+    <plurals name="episodes">
+        <item quantity="one">%d серия</item>
+        <item quantity="few">%d серии</item>
+        <item quantity="many">%d серий</item>
+        <item quantity="other">%d серии</item>
+    </plurals>
+    <plurals name="volumes">
+        <item quantity="one">%d том</item>
+        <item quantity="few">%d тома</item>
+        <item quantity="many">%d томов</item>
+        <item quantity="other">%d тома</item>
+    </plurals>
+    <plurals name="chapters">
+        <item quantity="one">%d глава</item>
+        <item quantity="few">%d главы</item>
+        <item quantity="many">%d глав</item>
+        <item quantity="other">%d главы</item>
+    </plurals>
+
+    <!-- Своя обложка (#1) -->
+    <string name="cover_own">Своя обложка</string>
+    <string name="cover_change">Другая картинка</string>
+    <string name="cover_reset">Вернуть обложку из каталога</string>
+    <string name="cover_remove">Убрать свою обложку</string>
+    <string name="cover_failed">Не получилось открыть картинку</string>
 </resources>

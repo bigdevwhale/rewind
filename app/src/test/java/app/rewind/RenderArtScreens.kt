@@ -80,6 +80,8 @@ abstract class ScreensBase {
     @Test fun wrapped() = home().let { shot("5-wrapped", it) { h, go -> MysteryScreen(h, go) } }
     @Test fun card() = home().let { h -> shot("6-card", h) { hh, go -> CardScreen(hh, go) } }
     @Test fun catalog() = home().let { shot("8-catalog", it) { h, go -> CatalogScreen(h, go) } }
+    @Test fun anime() = home().let { h -> shot("9-anime", h) { hh, go -> TapeScreen(hh.tapes.first { it.kindOf == app.rewind.data.Kind.ANIME }.id, hh, go) } }
+    @Test fun manga() = home().let { h -> shot("9-manga", h) { hh, go -> TapeScreen(hh.tapes.first { it.kindOf == app.rewind.data.Kind.MANGA }.id, hh, go) } }
     @Test fun lovedTape() = home().let { h -> shot("7-loved", h) { hh, go -> TapeScreen(loved(hh).id, hh, go) } }
 }
 

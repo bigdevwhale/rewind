@@ -2,6 +2,7 @@ package app.rewind.ui.tape
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -52,7 +53,9 @@ import app.rewind.ui.art.Stamp
 import app.rewind.ui.art.Stars
 import app.rewind.ui.art.TapeBox
 import app.rewind.ui.art.rememberCover
+import app.rewind.ui.components.OwnCoverLinks
 import app.rewind.ui.components.PrimaryButton
+import app.rewind.ui.components.rememberImagePicker
 import app.rewind.ui.components.SectionTitle
 import app.rewind.ui.components.SoftButton
 import app.rewind.ui.components.TextLink
@@ -69,6 +72,9 @@ fun TapeScreen(id: Long, h: Home, go: Go) {
     val container = c.container
     val slips = h.rentals(id).filter { !it.out }
     val scope = rememberCoroutineScope()
+    val pick = rememberImagePicker { uri ->
+        scope.launch { if (!container.store.ownCover(id, uri)) Toast.makeText(c, R.string.cover_failed, Toast.LENGTH_SHORT).show() }
+    }
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
         TopBar(T.kind(c, t.kindOf), go::back) {
             IconButton(onClick = {
@@ -79,7 +85,7 @@ fun TapeScreen(id: Long, h: Home, go: Go) {
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
             Row(verticalAlignment = Alignment.Bottom) {
-                TapeBox(t, rememberCover(t.cover), width = 150.dp, fade = h.fade(t), wear = h.wear(t))
+                TapeBox(t, rememberCover(t.face), width = 150.dp, fade = h.fade(t), wear = h.wear(t))
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) {
                     Text(t.title, style = UType.Display)
@@ -96,6 +102,7 @@ fun TapeScreen(id: Long, h: Home, go: Go) {
                     }
                 }
             }
+            OwnCoverLinks(t.ownCover != null, t.cover != null, pick, { container.write { store.ownCover(id, null) } }, Modifier.padding(top = 4.dp))
             // The back of the box.
             SectionTitle(stringResource(R.string.back_of_box))
             Box(Modifier.fillMaxWidth().clip(U.RSm).background(U.c.paper).padding(horizontal = 16.dp, vertical = 14.dp)) {

@@ -95,7 +95,7 @@ fun BinScreen(h: Home, go: Go) {
 @Composable
 private fun Item(t: Tape, h: Home, go: Go, sub: String, actions: @Composable () -> Unit) {
     Row(Modifier.fillMaxWidth().padding(vertical = 6.dp).clip(U.RMd).background(U.c.surface).clickable { go.tape(t.id) }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        TapeBox(t, rememberCover(t.cover), width = 58.dp, fade = maxOf(h.fade(t), if (t.placeOf == app.rewind.data.Place.BIN) 1f else 0f), wear = h.wear(t), sticker = if (t.placeOf == app.rewind.data.Place.BIN) "½" else null)
+        TapeBox(t, rememberCover(t.face), width = 58.dp, fade = maxOf(h.fade(t), if (t.placeOf == app.rewind.data.Place.BIN) 1f else 0f), wear = h.wear(t), sticker = if (t.placeOf == app.rewind.data.Place.BIN) "½" else null)
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(t.title, style = UType.Strong)

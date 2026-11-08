@@ -93,7 +93,7 @@ fun MysteryScreen(h: Home, go: Go) {
                 Spacer(Modifier.height(12.dp))
                 val torn by animateFloatAsState((taps / 3f).coerceAtMost(1f), tween(350), label = "torn")
                 Box(Modifier.width(210.dp), contentAlignment = Alignment.Center) {
-                    if (torn >= 1f) TapeBox(tape, rememberCover(tape.cover), width = 210.dp, fade = h.fade(tape), wear = h.wear(tape))
+                    if (torn >= 1f) TapeBox(tape, rememberCover(tape.face), width = 210.dp, fade = h.fade(tape), wear = h.wear(tape))
                     else Parcel(
                         stringResource(R.string.wrap_hint, T.kind(c, tape.kindOf).lowercase(), T.minutes(c, tape.length)),
                         torn,

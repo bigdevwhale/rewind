@@ -86,9 +86,12 @@ enum class Time {
     /** All the time in the world. */
     LONG;
 
+    /** Kinds taken a part at a time (an episode, a chapter), so any of them fits a short evening. */
+    private val byPart get() = setOf(Kind.SERIES, Kind.ANIME, Kind.BOOK, Kind.COMIC, Kind.MANGA)
+
     fun fits(t: Tape): Boolean = when (this) {
-        SHORT -> t.kindOf in setOf(Kind.SERIES, Kind.BOOK, Kind.COMIC) || t.length <= 60
-        EVENING -> t.kindOf in setOf(Kind.SERIES, Kind.BOOK, Kind.COMIC) || t.length <= 150
+        SHORT -> t.kindOf in byPart || t.length <= 60
+        EVENING -> t.kindOf in byPart || t.length <= 150
         LONG -> true
     }
 }

@@ -241,7 +241,7 @@ private fun IndexCard(t: Tape, h: Home, onClick: () -> Unit) {
             while (y < size.height - 4) { drawLine(rule, Offset(0f, y), Offset(size.width, y), 1f); y += 22.dp.toPx() }
         }
         Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 20.dp), verticalAlignment = Alignment.Top) {
-            TapeBox(t, rememberCover(t.cover), width = 46.dp, fade = h.fade(t), wear = h.wear(t))
+            TapeBox(t, rememberCover(t.face), width = 46.dp, fade = h.fade(t), wear = h.wear(t))
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(t.title, style = UType.Receipt.copy(fontSize = UType.Receipt.fontSize * 1.15f), maxLines = 1, overflow = TextOverflow.Ellipsis)

@@ -1,12 +1,18 @@
 package app.rewind.data
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
 import app.rewind.domain.Draft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -19,8 +25,9 @@ import java.util.UUID
 /**
  * Looking a title up, so a tape comes in with its cover, year, maker and length. All free and
  * keyless: films and series from Wikidata (posters from Wikipedia), series also from TVmaze, albums
- * from Apple's iTunes Search, books and comics (manga too) from Wikidata and iTunes. This is the
- * only thing that goes online, and only when someone searches.
+ * from Apple's iTunes Search, books and comics from Wikidata and iTunes, anime and manga from
+ * Jikan (MyAnimeList) and Wikidata. This is the only thing that goes online, and only when someone
+ * searches.
  */
 object Catalog {
     private const val AGENT = "Rewind/1.0 (https://github.com/bigdevwhale/rewind)"
@@ -28,6 +35,9 @@ object Catalog {
     private val films = setOf("Q11424", "Q202866", "Q24869", "Q506240", "Q93204", "Q17517379", "Q226730")
     private val series = setOf("Q5398426", "Q581714", "Q1259759", "Q526877", "Q117467246", "Q63952888")
     private val comics = setOf("Q1004", "Q14406742", "Q8274", "Q21198342", "Q725377", "Q1760610", "Q867335", "Q838795", "Q74262765")
+    /** Anime series, anime, anime films, OVAs (#2). */
+    private val anime = setOf("Q63952888", "Q1107", "Q20650540", "Q220898")
+    private val manga = setOf("Q8274", "Q21198342")
     private val books = setOf("Q7725634", "Q8261", "Q571", "Q47461344", "Q49084", "Q1667921", "Q5185279", "Q25379", "Q12308638")
 
     suspend fun search(kind: Kind, query: String, ru: Boolean): List<Draft> = withContext(Dispatchers.IO) {
@@ -40,6 +50,9 @@ object Catalog {
                 Kind.ALBUM -> listOf(async { itunes(q, kind, ru) })
                 Kind.BOOK -> listOf(async { wikidata(q, kind, books, ru) }, async { itunes(q, kind, ru) })
                 Kind.COMIC -> listOf(async { wikidata(q, kind, comics, ru) }, async { itunes(q, kind, ru) })
+                // MyAnimeList knows every title but only in English and romaji; Wikidata has the Russian names.
+                Kind.ANIME -> listOf(async { jikan(q, kind) }, async { wikidata(q, kind, anime, ru) }).let { if (ru) it.reversed() else it }
+                Kind.MANGA -> listOf(async { jikan(q, kind) }, async { wikidata(q, kind, manga, ru) }).let { if (ru) it.reversed() else it }
             }.awaitAll()
         }
         // Each source in turn, best first, without the same title twice.
@@ -99,6 +112,69 @@ object Catalog {
         return words.any { it in hay }
     }
 
+    private val jikanGate = Mutex()
+    private var jikanLast = 0L
+
+    /**
+     * Anime and manga from Jikan, the open MyAnimeList API (#2). It allows about three requests a
+     * second, so calls are spaced out, and a refused one (429) is tried once more a second later.
+     */
+    private suspend fun jikan(q: String, kind: Kind): List<Draft> {
+        val what = if (kind == Kind.MANGA) "manga" else "anime"
+        val url = "https://api.jikan.moe/v4/$what?q=${enc(q)}&limit=10&sfw=true"
+        repeat(2) { attempt ->
+            val body = jikanGate.withLock {
+                val wait = jikanLast + 400 - System.currentTimeMillis()
+                if (wait > 0) delay(wait)
+                get(url).also { jikanLast = System.currentTimeMillis() }
+            }
+            if (body != null) return runCatching { jikanParse(body, kind) }.getOrDefault(emptyList())
+            if (attempt == 0) delay(1_000)
+        }
+        return emptyList()
+    }
+
+    /** One page of Jikan results as drafts: the English title if there is one, the original next to it. */
+    internal fun jikanParse(body: String, kind: Kind): List<Draft> {
+        val data = JSONObject(body).optJSONArray("data") ?: return emptyList()
+        return (0 until data.length()).mapNotNull { data.optJSONObject(it) }.map { o ->
+            val romaji = o.str("title")
+            val title = o.str("title_english") ?: romaji ?: ""
+            val original = (romaji?.takeIf { it != title } ?: o.str("title_japanese"))?.takeIf { it != title }
+            val makers = if (kind == Kind.MANGA) "authors" else "studios"
+            val creator = o.optJSONArray(makers)?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.str("name") } }.orEmpty()
+                .take(2).joinToString(", ") { if (kind == Kind.MANGA) person(it) else it }
+            val start = o.optJSONObject(if (kind == Kind.MANGA) "published" else "aired")?.str("from")
+            Draft(
+                kind = kind,
+                title = title,
+                creator = creator,
+                year = o.optInt("year").takeIf { it > 0 } ?: year(start),
+                minutes = if (kind == Kind.ANIME) runtime(o.str("duration")) else null,
+                link = o.str("url"),
+                coverUrl = o.optJSONObject("images")?.optJSONObject("jpg")?.let { it.str("large_image_url") ?: it.str("image_url") },
+                original = original,
+                episodes = if (kind == Kind.ANIME) o.optInt("episodes").takeIf { it > 0 } else null,
+                volumes = if (kind == Kind.MANGA) o.optInt("volumes").takeIf { it > 0 } else null,
+                chapters = if (kind == Kind.MANGA) o.optInt("chapters").takeIf { it > 0 } else null,
+            )
+        }.filter { it.title.isNotBlank() }
+    }
+
+    /** A string that is there and not blank; Jikan writes null for what it doesn't know. */
+    private fun JSONObject.str(name: String): String? = if (isNull(name)) null else optString(name).trim().ifBlank { null }
+
+    /** MyAnimeList writes people surname first: "Miura, Kentarou" is Kentarou Miura. */
+    private fun person(name: String): String = name.split(", ").let { if (it.size == 2) it[1] + " " + it[0] else name }
+
+    /** "24 min per ep", "1 hr 35 min" in minutes. */
+    private fun runtime(s: String?): Int? {
+        s ?: return null
+        val h = Regex("""(\d+)\s*hr""").find(s)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+        val m = Regex("""(\d+)\s*min""").find(s)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+        return (h * 60 + m).takeIf { it > 0 }
+    }
+
     private suspend fun tvmaze(q: String): List<Draft> {
         val body = get("https://api.tvmaze.com/search/shows?q=${enc(q)}") ?: return emptyList()
         val arr = JSONArray(body)
@@ -128,7 +204,8 @@ object Catalog {
             Kind.FILM -> listOf("P57")
             Kind.SERIES -> listOf("P170", "P57", "P449")
             Kind.BOOK -> listOf("P50")
-            Kind.COMIC -> listOf("P50", "P170")
+            Kind.COMIC, Kind.MANGA -> listOf("P50", "P170")
+            Kind.ANIME -> listOf("P272", "P170", "P57")
             Kind.ALBUM -> listOf("P175")
         }
         class Raw(val label: String, val year: Int?, val minutes: Int?, val maker: String?, val enwiki: String?, val ruwiki: String?, val image: String?)
@@ -215,5 +292,40 @@ object Covers {
 
     fun delete(context: Context, name: String?) {
         file(context, name)?.delete()
+    }
+
+    /** The long side of the owner's own covers: sharp on the tape's page, small in a backup. */
+    private const val OWN_SIDE = 600
+
+    /**
+     * The owner's own cover (#1): a picture picked in the gallery, scaled down and kept as a JPEG in
+     * the covers folder, so it stays when the original is deleted. The file's name, or null.
+     */
+    suspend fun fromGallery(context: Context, uri: Uri): String? = withContext(Dispatchers.IO) {
+        try {
+            val src = ImageDecoder.createSource(context.contentResolver, uri)
+            // ImageDecoder turns the photo upright by its EXIF and scales while decoding.
+            val bmp = ImageDecoder.decodeBitmap(src) { d, info, _ ->
+                val w = info.size.width
+                val h = info.size.height
+                val k = OWN_SIDE.toFloat() / maxOf(w, h)
+                if (k < 1f) d.setTargetSize((w * k).toInt().coerceAtLeast(1), (h * k).toInt().coerceAtLeast(1))
+                d.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            }
+            val name = "own-" + UUID.randomUUID().toString() + ".jpg"
+            File(dir(context), name).outputStream().use { bmp.compress(Bitmap.CompressFormat.JPEG, 85, it) }
+            bmp.recycle()
+            name
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Pictures no tape points at: picked in a form that was then left, or from a tape thrown out
+     * while a write was in flight. Only those a day old go, so a form still open keeps its pick.
+     */
+    fun sweep(context: Context, used: Set<String>, now: Long = System.currentTimeMillis()) {
+        dir(context).listFiles()?.forEach { f -> if (f.name !in used && now - f.lastModified() > 24 * 3_600_000L) f.delete() }
     }
 }

@@ -70,10 +70,12 @@ object T {
             Kind.ALBUM -> R.string.kind_album
             Kind.BOOK -> R.string.kind_book
             Kind.COMIC -> R.string.kind_comic
+            Kind.ANIME -> R.string.kind_anime
+            Kind.MANGA -> R.string.kind_manga
         },
     )
 
-    /** The aisle's name: "Films", "Series", "Music", "Books", "Comics". */
+    /** The aisle's name: "Films", "Series", "Anime", "Music", "Books", "Comics", "Manga". */
     fun aisle(c: Context, k: Kind): String = c.getString(
         when (k) {
             Kind.FILM -> R.string.aisle_film
@@ -81,6 +83,8 @@ object T {
             Kind.ALBUM -> R.string.aisle_album
             Kind.BOOK -> R.string.aisle_book
             Kind.COMIC -> R.string.aisle_comic
+            Kind.ANIME -> R.string.aisle_anime
+            Kind.MANGA -> R.string.aisle_manga
         },
     )
 
@@ -88,9 +92,9 @@ object T {
     fun loan(c: Context, k: Kind): String = c.getString(
         when (k) {
             Kind.FILM, Kind.ALBUM -> R.string.loan_two_days
-            Kind.SERIES -> R.string.loan_week
+            Kind.SERIES, Kind.ANIME -> R.string.loan_week
             Kind.BOOK -> R.string.loan_two_weeks
-            Kind.COMIC -> R.string.loan_three_days
+            Kind.COMIC, Kind.MANGA -> R.string.loan_three_days
         },
     )
 }

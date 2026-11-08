@@ -184,7 +184,7 @@ private fun OutSlot(t: Tape, r: Rental, h: Home, go: Go, modifier: Modifier) {
         modifier.clip(U.RMd).background(U.c.surface).border(1.dp, if (late) U.c.amber else U.c.cyan.copy(alpha = 0.5f), U.RMd).clickable { go.giveBack(r.id) }.padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        TapeBox(t, rememberCover(t.cover), width = 72.dp, wear = h.wear(t))
+        TapeBox(t, rememberCover(t.face), width = 72.dp, wear = h.wear(t))
         Spacer(Modifier.height(8.dp))
         Text(t.title, style = UType.Strong, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(
@@ -215,7 +215,7 @@ private fun Aisle(title: String, tapes: List<Tape>, h: Home, go: Go, hand: Boole
         LazyRow(contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.Bottom) {
             items(tapes, key = { it.id }) { t ->
                 Column(Modifier.width(104.dp).clickable { go.tape(t.id) }) {
-                    TapeBox(t, rememberCover(t.cover), fade = h.fade(t), wear = h.wear(t), sticker = if (h.watched(t) == 0 && t.readyAt > h.now - 7 * Rules.DAY && tag == null) stringResource(R.string.sticker_new) else null)
+                    TapeBox(t, rememberCover(t.face), fade = h.fade(t), wear = h.wear(t), sticker = if (h.watched(t) == 0 && t.readyAt > h.now - 7 * Rules.DAY && tag == null) stringResource(R.string.sticker_new) else null)
                     Spacer(Modifier.height(6.dp))
                     Text(tag?.invoke(t) ?: t.title, style = UType.Small.copy(color = if (tag != null) U.c.cyan else U.c.muted), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     val stars = h.stars(t)

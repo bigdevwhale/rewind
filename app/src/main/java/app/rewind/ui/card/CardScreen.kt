@@ -95,7 +95,7 @@ fun CardScreen(h: Home, go: Go) {
                 val t = h.tape(id) ?: return@let
                 SectionTitle(stringResource(if (m == month) R.string.hit_month else R.string.hit_last_month))
                 Row(Modifier.fillMaxWidth().clip(U.RMd).background(U.c.surface).clickable { go.tape(id) }.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    TapeBox(t, rememberCover(t.cover), width = 70.dp, wear = h.wear(t))
+                    TapeBox(t, rememberCover(t.face), width = 70.dp, wear = h.wear(t))
                     Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text("★ " + t.title, style = UType.Title)

@@ -1,5 +1,6 @@
 package app.rewind.ui.add
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.rewind.R
 import app.rewind.container
+import app.rewind.data.Covers
 import app.rewind.data.Kind
 import app.rewind.domain.Draft
 import app.rewind.ui.Go
@@ -53,7 +55,9 @@ import app.rewind.ui.art.rememberCover
 import app.rewind.ui.art.rememberRemote
 import app.rewind.ui.components.Field
 import app.rewind.ui.components.PrimaryButton
-import app.rewind.ui.components.Segmented
+import app.rewind.ui.components.KindPicker
+import app.rewind.ui.components.OwnCoverLinks
+import app.rewind.ui.components.rememberImagePicker
 import app.rewind.ui.components.SectionTitle
 import app.rewind.ui.components.SoftButton
 import app.rewind.ui.components.TopBar
@@ -74,7 +78,7 @@ fun AddScreen(id: Long, h: Home, go: Go) {
     val incoming by container.draft.collectAsStateWithLifecycle()
     var d by remember {
         mutableStateOf(
-            editing?.let { Draft(it.kindOf, it.title, it.creator, it.year, it.minutes, it.blurb, it.from, it.link) } ?: Draft(),
+            editing?.let { Draft(it.kindOf, it.title, it.creator, it.year, it.minutes, it.blurb, it.from, it.link, ownCover = it.ownCover) } ?: Draft(),
         )
     }
     // A pick from the catalogue (or a share) fills in what it knows, and keeps what you wrote.
@@ -89,11 +93,25 @@ fun AddScreen(id: Long, h: Home, go: Go) {
     }
     var saving by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    // A picture picked here is copied in at once; one the form then lets go of, unsaved, is deleted (#1).
+    fun dropPicked() {
+        if (d.ownCover != editing?.ownCover) Covers.delete(c, d.ownCover)
+    }
+    val pick = rememberImagePicker { uri ->
+        scope.launch {
+            val name = Covers.fromGallery(c, uri)
+            if (name == null) Toast.makeText(c, R.string.cover_failed, Toast.LENGTH_SHORT).show()
+            else {
+                dropPicked()
+                d = d.copy(ownCover = name)
+            }
+        }
+    }
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).imePadding()) {
         TopBar(stringResource(if (editing != null) R.string.edit else R.string.bring_in), go::back)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
-            Segmented(Kind.entries, d.kind, { T.kind(c, it) }, { d = d.copy(kind = it) })
+            KindPicker(d.kind, { d = d.copy(kind = it) })
             Spacer(Modifier.height(14.dp))
             SoftButton(stringResource(R.string.find_in_catalog), {
                 container.draft.value = null
@@ -103,7 +121,19 @@ fun AddScreen(id: Long, h: Home, go: Go) {
             }, Modifier.fillMaxWidth(), icon = Icons.Rounded.Search)
             Spacer(Modifier.height(16.dp))
             Row(verticalAlignment = Alignment.Top) {
-                Preview(d, editing?.cover, editing?.seed ?: d.title.hashCode().toLong())
+                Column {
+                    Preview(d, editing?.cover, editing?.seed ?: d.title.hashCode().toLong())
+                    OwnCoverLinks(
+                        own = d.ownCover != null,
+                        catalogue = d.coverUrl != null || editing?.cover != null,
+                        onPick = pick,
+                        onDrop = {
+                            dropPicked()
+                            d = d.copy(ownCover = null)
+                        },
+                        modifier = Modifier.width(112.dp),
+                    )
+                }
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Field(d.title, { d = d.copy(title = it) }, stringResource(R.string.f_title))
@@ -146,15 +176,17 @@ fun AddScreen(id: Long, h: Home, go: Go) {
 private fun creatorLabel(k: Kind) = when (k) {
     Kind.FILM -> R.string.f_director
     Kind.SERIES -> R.string.f_network
+    Kind.ANIME -> R.string.f_studio
     Kind.ALBUM -> R.string.f_artist
-    Kind.BOOK, Kind.COMIC -> R.string.f_author
+    Kind.BOOK, Kind.COMIC, Kind.MANGA -> R.string.f_author
 }
 
-/** The box as it'll stand on the shelf: the catalogue's picture if one was picked. */
+/** The box as it'll stand on the shelf: the owner's own picture, else the catalogue's if one was picked. */
 @Composable
 private fun Preview(d: Draft, saved: String?, seed: Long) {
+    val own = rememberCover(d.ownCover)
     val remote = rememberRemote(d.coverUrl)
-    val cover = remote ?: rememberCover(saved)
+    val cover = if (d.ownCover != null) own else remote ?: rememberCover(saved)
     TapeBox(app.rewind.data.Tape(kind = d.kind.name, title = d.title.ifBlank { "?" }, creator = d.creator, seed = seed), cover, width = 112.dp)
 }
 
@@ -194,7 +226,11 @@ fun Hit(d: Draft, onClick: () -> Unit) {
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Text(d.title, style = UType.Strong, maxLines = 2)
-            val meta = listOfNotNull(d.year?.toString(), d.creator.ifBlank { null }, d.minutes?.let { T.minutes(c, it) }).joinToString(" · ")
+            if (d.original != null) Text(d.original, style = UType.Small, maxLines = 1)
+            val run = d.episodes?.let { T.plural(c, R.plurals.episodes, it) }
+                ?: d.volumes?.let { T.plural(c, R.plurals.volumes, it) }
+                ?: d.chapters?.let { T.plural(c, R.plurals.chapters, it) }
+            val meta = listOfNotNull(d.year?.toString(), d.creator.ifBlank { null }, run, d.minutes?.let { T.minutes(c, it) }).joinToString(" · ")
             if (meta.isNotBlank()) Text(meta, style = UType.Muted, maxLines = 2)
         }
     }

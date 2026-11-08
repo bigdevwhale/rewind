@@ -43,6 +43,7 @@ class RewindApp : Application() {
         container = AppContainer(this)
         if (BuildConfig.DEMO) container.scope.launch { DemoSeed.seedIfEmpty(this@RewindApp, container) }
         Reminders.schedule(this)
+        container.scope.launch { container.store.sweepCovers() }
     }
 }
 

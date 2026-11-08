@@ -47,7 +47,7 @@
     <string name="rule_two">Two tapes at a time</string>
     <string name="rule_two_sub">Bring one back to take another. Nothing hangs about half‑watched.</string>
     <string name="rule_due">Due back</string>
-    <string name="rule_due_sub">A film or an album for two evenings, a comic for three days, a series for a week, a book for two weeks. Rewind it before it goes back, and write three words on the slip.</string>
+    <string name="rule_due_sub">A film or an album for two evenings, a comic or a manga for three days, a series or an anime for a week, a book for two weeks. Rewind it before it goes back, and write three words on the slip.</string>
     <string name="rule_hours">Evening hours</string>
     <string name="rule_hours_sub">Open from 6 pm on weekdays and from noon at the weekend, until 11. No choosing at three in the morning.</string>
     <string name="rule_window">New in the window</string>
@@ -130,7 +130,7 @@
     <string name="put_on_shelf">Put it in the store</string>
     <string name="search_hint">Title, in any language</string>
     <string name="search_none">Nothing found. Try another spelling, or type it in by hand.</string>
-    <string name="search_sources">Films and series from Wikidata and Wikipedia, series also from TVmaze, albums from Apple’s iTunes, books and comics from Wikidata and iTunes. Searching is the only thing that goes online.</string>
+    <string name="search_sources">Films and series from Wikidata and Wikipedia, series also from TVmaze, albums from Apple’s iTunes, books and comics from Wikidata and iTunes, anime and manga from MyAnimeList (through Jikan) and Wikidata. Searching is the only thing that goes online.</string>
 
     <!-- Receipt -->
     <string name="receipt_head">VIDEO · AUDIO · BOOKS</string>
@@ -294,4 +294,30 @@ WINDOW</string>
     <string name="community_follow_hint">the bot writes when a version is out</string>
     <string name="community_chat">StillCraft chat</string>
     <string name="community_chat_hint">all the apps and people</string>
+
+    <!-- Anime and manga (#2) -->
+    <string name="kind_anime">Anime</string>
+    <string name="kind_manga">Manga</string>
+    <string name="aisle_anime">Anime</string>
+    <string name="aisle_manga">Manga</string>
+    <string name="f_studio">Studio</string>
+    <plurals name="episodes">
+        <item quantity="one">%d episode</item>
+        <item quantity="other">%d episodes</item>
+    </plurals>
+    <plurals name="volumes">
+        <item quantity="one">%d volume</item>
+        <item quantity="other">%d volumes</item>
+    </plurals>
+    <plurals name="chapters">
+        <item quantity="one">%d chapter</item>
+        <item quantity="other">%d chapters</item>
+    </plurals>
+
+    <!-- Your own cover (#1) -->
+    <string name="cover_own">Your own cover</string>
+    <string name="cover_change">Another picture</string>
+    <string name="cover_reset">Back to the catalogue cover</string>
+    <string name="cover_remove">Remove your cover</string>
+    <string name="cover_failed">Couldn’t open that picture</string>
 </resources>

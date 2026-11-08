@@ -100,6 +100,8 @@ class SharesTest {
         assertEquals("Kind of Blue", s.title)
         assertEquals("Miles Davis", s.creator)
         assertEquals(Kind.BOOK, Shares.parse("Dune https://www.goodreads.com/book/show/44767458-dune").kind)
-        assertEquals(Kind.COMIC, Shares.parse("Berserk https://myanimelist.net/manga/2/Berserk").kind)
+        assertEquals(Kind.MANGA, Shares.parse("Berserk https://myanimelist.net/manga/2/Berserk").kind)
+        assertEquals(Kind.ANIME, Shares.parse("https://myanimelist.net/anime/1/Cowboy_Bebop").kind)
+        assertEquals(Kind.COMIC, Shares.parse("Saga https://comicvine.gamespot.com/saga/4050-45472/").kind)
     }
 }

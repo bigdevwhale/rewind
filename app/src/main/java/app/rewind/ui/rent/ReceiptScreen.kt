@@ -50,7 +50,7 @@ fun ReceiptScreen(id: Long, h: Home, go: Go) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(28.dp))
-        TapeBox(t, rememberCover(t.cover), width = 120.dp, wear = h.wear(t))
+        TapeBox(t, rememberCover(t.face), width = 120.dp, wear = h.wear(t))
         Spacer(Modifier.height(24.dp))
         val paper = U.c.paper
         Canvas(Modifier.fillMaxWidth().height(8.dp)) { zigzag(paper, top = true) }

@@ -19,14 +19,17 @@ import kotlinx.coroutines.flow.Flow
 /**
  * What a tape is, and so how it looks on the shelf and how long it can stay out: a film on a VHS
  * for two evenings, a series box set for a week, an album on an audio cassette for two evenings, a
- * book from the library corner for two weeks, a comic from the spinner rack for three days.
+ * book from the library corner for two weeks, a comic from the spinner rack for three days. Anime
+ * goes out like a series and manga like a comic (#2). Stored by name, so new kinds need no migration.
  */
 enum class Kind(val loanHours: Int, val minutes: Int) {
     FILM(48, 110),
     SERIES(7 * 24, 45),
+    ANIME(7 * 24, 24),
     ALBUM(48, 45),
     BOOK(14 * 24, 300),
-    COMIC(72, 60);
+    COMIC(72, 60),
+    MANGA(72, 60);
 
     companion object {
         fun of(s: String) = entries.firstOrNull { it.name == s } ?: FILM
@@ -71,7 +74,11 @@ data class Tape(
     val link: String? = null,
     /** A picture file in the app's covers folder, from the catalogue; without one the box is drawn from [seed]. */
     val cover: String? = null,
+    /** The owner's own picture from the gallery (#1), in the same folder; shown instead of [cover] while set. */
+    val ownCover: String? = null,
 ) {
+    /** The picture on the box: the owner's own, else the catalogue's. */
+    val face: String? get() = ownCover ?: cover
     val kindOf: Kind get() = Kind.of(kind)
     val placeOf: Place get() = Place.of(place)
     val length: Int get() = minutes ?: kindOf.minutes
@@ -170,7 +177,7 @@ interface StoreDao {
     }
 }
 
-@Database(entities = [Tape::class, Rental::class], version = 2, exportSchema = true, autoMigrations = [AutoMigration(from = 1, to = 2)])
+@Database(entities = [Tape::class, Rental::class], version = 3, exportSchema = true, autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)])
 abstract class StoreDatabase : RoomDatabase() {
     abstract fun dao(): StoreDao
 

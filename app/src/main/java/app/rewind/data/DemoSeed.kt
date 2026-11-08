@@ -9,7 +9,7 @@ import java.time.ZoneId
 
 /**
  * A lived-in store for the demo build and the screenshots, as of an evening (8:30 pm): well-known
- * films, series, albums, books and comics on the shelves with drawn boxes, a few months of slips, two tapes
+ * films, series, anime, albums, books, comics and manga on the shelves with drawn boxes, a few months of slips, two tapes
  * at home, two in the window, a friend's shelf, one bleached by the sun and one in the bin.
  */
 object DemoSeed {
@@ -48,6 +48,9 @@ object DemoSeed {
         Item(Kind.FILM, "Tenet", "Довод", "Christopher Nolan", "Кристофер Нолан", 2020, 150, "Everyone said I had to.", "Все говорили, что надо.", age = 215),
         // In the bin.
         Item(Kind.SERIES, "Game of Thrones", "Игра престолов", "HBO", "HBO", 2011, 57, age = 240),
+        // Anime and manga (#2), at the end so the boxes above keep their seeds.
+        Item(Kind.ANIME, "Cowboy Bebop", "Ковбой Бибоп", "Sunrise", "Sunrise", 1998, 24, "Jazz, space and a corgi. One session a night.", "Джаз, космос и корги. По одной серии на ночь.", age = 70),
+        Item(Kind.MANGA, "Yotsuba&!", "Ёцуба!", "Kiyohiko Azuma", "Киёхико Адзума", 2003, 60, "For a bad day. Works every time.", "На случай плохого дня. Помогает всегда.", age = 26),
     )
 
     private val slipsEn = listOf(
@@ -109,6 +112,7 @@ object DemoSeed {
         back("In the Mood for Love", 62.0, 22.0, 2, mystery = true, stars = 4)
         back("Blood Type", 55.0, 30.0, 4, stars = 3)
         back("The Master and Margarita", 50.0, 300.0, null, Outcome.REWOUND, if (ru) "Не то время года. Вернусь осенью." else "Wrong season for it. Back in the autumn.")
+        back("Cowboy Bebop", 44.0, 150.0, null, stars = 5)
         back("Persepolis", 35.0, 50.0, null, stars = 4)
         back("Stalker", 30.0, 44.0, null)
         back("Kind of Blue", 20.0, 18.0, null, stars = 5)

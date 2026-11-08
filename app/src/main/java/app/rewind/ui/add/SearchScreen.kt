@@ -34,7 +34,7 @@ import app.rewind.ui.Go
 import app.rewind.ui.Home
 import app.rewind.ui.T
 import app.rewind.ui.components.Field
-import app.rewind.ui.components.Segmented
+import app.rewind.ui.components.KindPicker
 import app.rewind.ui.components.TopBar
 import app.rewind.ui.ctx
 import app.rewind.ui.theme.U
@@ -63,7 +63,7 @@ fun SearchScreen(h: Home, go: Go) {
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).imePadding()) {
         TopBar(stringResource(R.string.find_in_catalog), go::back)
         Column(Modifier.padding(horizontal = 20.dp)) {
-            Segmented(Kind.entries, kind, { T.kind(c, it) }, { kind = it })
+            KindPicker(kind, { kind = it })
             Spacer(Modifier.height(10.dp))
             Field(query, { query = it }, stringResource(R.string.search_hint))
         }

@@ -143,9 +143,9 @@ fun ReturnScreen(id: Long, h: Home, go: Go) {
 
 private fun label(o: Outcome, k: Kind) = when (o) {
     Outcome.WATCHED -> when (k) {
-        Kind.FILM, Kind.SERIES -> R.string.out_watched
+        Kind.FILM, Kind.SERIES, Kind.ANIME -> R.string.out_watched
         Kind.ALBUM -> R.string.out_heard
-        Kind.BOOK, Kind.COMIC -> R.string.out_read
+        Kind.BOOK, Kind.COMIC, Kind.MANGA -> R.string.out_read
     }
     Outcome.REWOUND -> R.string.out_rewound
 }

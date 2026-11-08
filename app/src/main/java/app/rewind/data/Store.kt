@@ -1,6 +1,7 @@
 package app.rewind.data
 
 import android.content.Context
+import android.net.Uri
 import app.rewind.domain.Draft
 import app.rewind.domain.Rules
 import app.rewind.notify.Reminders
@@ -28,6 +29,7 @@ class Store(private val context: Context, private val db: StoreDatabase, private
                 readyAt = now + days * Rules.DAY,
                 link = d.link,
                 cover = cover,
+                ownCover = d.ownCover,
             ),
         )
         Reminders.schedule(context)
@@ -38,7 +40,23 @@ class Store(private val context: Context, private val db: StoreDatabase, private
         val t = dao.tape(id) ?: return
         // A new cover picked from the catalogue replaces the old one.
         val cover = d.coverUrl?.let { Catalog.fetchCover(context, it) }?.also { Covers.delete(context, t.cover) } ?: t.cover
-        dao.update(t.copy(cover = cover, link = d.link ?: t.link, kind = d.kind.name, title = d.title.trim(), creator = d.creator.trim(), year = d.year, minutes = d.minutes, blurb = d.blurb.trim(), from = d.from.trim()))
+        // The form carries the own cover the tape should have (#1); one dropped or replaced goes.
+        if (d.ownCover != t.ownCover) Covers.delete(context, t.ownCover)
+        dao.update(t.copy(cover = cover, ownCover = d.ownCover, link = d.link ?: t.link, kind = d.kind.name, title = d.title.trim(), creator = d.creator.trim(), year = d.year, minutes = d.minutes, blurb = d.blurb.trim(), from = d.from.trim()))
+    }
+
+    /** The owner's own cover from the gallery (#1), or with null back to the catalogue's. False if the picture wouldn't open. */
+    suspend fun ownCover(id: Long, uri: Uri?): Boolean {
+        val name = uri?.let { Covers.fromGallery(context, it) ?: return false }
+        val t = dao.tape(id) ?: return true.also { Covers.delete(context, name) }
+        Covers.delete(context, t.ownCover)
+        dao.update(t.copy(ownCover = name))
+        return true
+    }
+
+    /** Pictures in the covers folder that no tape carries any more. */
+    suspend fun sweepCovers() {
+        Covers.sweep(context, dao.tapes().flatMap { listOfNotNull(it.cover, it.ownCover) }.toSet())
     }
 
     suspend fun rent(id: Long, mystery: Boolean = false, now: Long = System.currentTimeMillis()): Long {
@@ -81,5 +99,6 @@ class Store(private val context: Context, private val db: StoreDatabase, private
         val t = dao.tape(id) ?: return
         dao.forget(id)
         Covers.delete(context, t.cover)
+        Covers.delete(context, t.ownCover)
     }
 }
