@@ -6,6 +6,15 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.1.1] - 2026-11-08
+
+### Added
+- Support Rewind: Settings → StillCraft has a fifth line, «Поддержать Прокат · на новые кассеты и перемотку», which opens the StillCraft support page in the browser.
+
+<!-- tg
+В настройках, в блоке StillCraft, появилась строчка «Поддержать Прокат» – на новые кассеты и перемотку.
+-->
+
 ## [1.1.0] - 2026-11-08
 
 ### Added

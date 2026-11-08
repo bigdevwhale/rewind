@@ -294,6 +294,8 @@ WINDOW</string>
     <string name="community_follow_hint">the bot writes when a version is out</string>
     <string name="community_chat">StillCraft chat</string>
     <string name="community_chat_hint">all the apps and people</string>
+    <string name="community_support">Support Rewind</string>
+    <string name="community_support_hint">for new tapes and rewinding</string>
 
     <!-- Anime and manga (#2) -->
     <string name="kind_anime">Anime</string>
