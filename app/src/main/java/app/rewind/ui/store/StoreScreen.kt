@@ -1,5 +1,12 @@
 package app.rewind.ui.store
 
+import app.rewind.ui.components.Chip
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import app.rewind.ui.art.aspect
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -46,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.rewind.R
 import app.rewind.data.Kind
 import app.rewind.data.Rental
@@ -68,9 +76,19 @@ import app.rewind.ui.theme.U
 import app.rewind.ui.theme.UType
 
 /** The store: the sign, the clerk, what's at home, the window, the aisles, friends' shelves. */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun StoreScreen(h: Home, go: Go) {
     val c = ctx()
+    // What the shelves show: one kind of box, and/or only the untouched or the best-loved ones.
+    var kindOnly by rememberSaveable { mutableStateOf<Kind?>(null) }
+    var only by rememberSaveable { mutableStateOf(Only.ALL) }
+    fun keep(t: Tape) = (kindOnly == null || t.kindOf == kindOnly) && when (only) {
+        Only.ALL -> true
+        Only.NEVER -> h.taken(t) == 0
+        Only.LOVED -> h.stars(t) >= 4
+    }
+    val filtered = kindOnly != null || only != Only.ALL
     LazyColumn(
         Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(U.c.bg, U.c.bg, U.c.carpet.copy(alpha = 0.55f)))),
         contentPadding = PaddingValues(bottom = 32.dp),
@@ -100,29 +118,48 @@ fun StoreScreen(h: Home, go: Go) {
                 SoftButton(stringResource(R.string.wrapped), go::mystery, Modifier.weight(1f), icon = Icons.Rounded.CardGiftcard, enabled = h.shelf.isNotEmpty())
             }
         }
-        if (h.window.isNotEmpty()) item {
-            Aisle(stringResource(R.string.window_title), h.window, h, go) { t -> stringResource(R.string.window_in, T.left(c, t.readyAt - h.now)) }
+        // The rest of the shop, up here so a long list doesn't hide it at the very bottom.
+        item {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                MoreTile(Icons.Rounded.Search, stringResource(R.string.catalog_title), T.plural(c, R.plurals.cards, h.tapes.size), go::catalog, Modifier.weight(1f))
+                MoreTile(Icons.Rounded.Style, stringResource(R.string.card_title), T.plural(c, R.plurals.stamps, h.returned.size), go::card, Modifier.weight(1f))
+                MoreTile(Icons.Rounded.Inventory2, stringResource(R.string.bin_title), h.bin.size.toString(), go::bin, Modifier.weight(1f))
+            }
         }
-        if (h.hits.isNotEmpty()) item(key = "hits") { Aisle(stringResource(R.string.hits_title), h.hits, h, go) }
+        if (h.shelf.isNotEmpty() || h.window.isNotEmpty()) stickyHeader(key = "filter") {
+            Row(
+                Modifier.fillMaxWidth().background(U.c.bg).horizontalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Chip(stringResource(R.string.show_all), !filtered) { kindOnly = null; only = Only.ALL }
+                Kind.entries.filter { k -> h.tapes.any { it.kindOf == k } }.forEach { k -> Chip(T.aisle(c, k), kindOnly == k) { kindOnly = if (kindOnly == k) null else k } }
+                Spacer(Modifier.width(6.dp))
+                Chip(stringResource(R.string.show_never), only == Only.NEVER) { only = if (only == Only.NEVER) Only.ALL else Only.NEVER }
+                Chip(stringResource(R.string.only_loved), only == Only.LOVED) { only = if (only == Only.LOVED) Only.ALL else Only.LOVED }
+            }
+        }
+        val window = h.window.filter(::keep)
+        if (window.isNotEmpty()) item(key = "window") {
+            Aisle(stringResource(R.string.window_title), window, h, go) { t -> stringResource(R.string.window_in, T.left(c, t.readyAt - h.now)) }
+        }
+        val hits = h.hits.filter(::keep)
+        if (hits.isNotEmpty() && only != Only.LOVED) item(key = "hits") { Aisle(stringResource(R.string.hits_title), hits, h, go) }
+        var shown = window.size + hits.size
         Kind.entries.forEach { k ->
-            val tapes = h.aisle(k)
+            val tapes = h.aisle(k).filter(::keep)
+            shown += tapes.size
             if (tapes.isNotEmpty()) item(key = "aisle-$k") { Aisle(T.aisle(c, k), tapes, h, go) }
         }
-        h.picks.forEach { (who, tapes) ->
-            item(key = "pick-$who") { Aisle(stringResource(R.string.picks_of, who), tapes, h, go, hand = true) }
+        h.picks.forEach { (who, all) ->
+            val tapes = all.filter(::keep)
+            shown += tapes.size
+            if (tapes.isNotEmpty()) item(key = "pick-$who") { Aisle(stringResource(R.string.picks_of, who), tapes, h, go, hand = true) }
         }
         if (h.tapes.isEmpty()) item { Empty() }
-        item {
-            Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
-                SectionTitle(stringResource(R.string.more_title))
-                UCard(padding = PaddingValues(horizontal = 14.dp, vertical = 4.dp)) {
-                    InfoRow(Icons.Rounded.Search, stringResource(R.string.catalog_title), T.plural(c, R.plurals.cards, h.tapes.size), go::catalog)
-                    InfoRow(Icons.Rounded.Style, stringResource(R.string.card_title), T.plural(c, R.plurals.stamps, h.returned.size), go::card)
-                    InfoRow(Icons.Rounded.Inventory2, stringResource(R.string.bin_title), stringResource(R.string.bin_count, h.bin.size, h.bleached.size), go::bin)
-                }
-            }
-            Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
+        else if (filtered && shown == 0) item {
+            Text(stringResource(R.string.filter_none), style = UType.Muted, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 28.dp))
         }
+        item { Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars)) }
     }
 }
 
@@ -208,6 +245,20 @@ private fun FreeSlot(modifier: Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         Text(stringResource(R.string.free_hand), style = UType.Muted.copy(color = U.c.faint), textAlign = TextAlign.Center, modifier = Modifier.padding(16.dp))
+    }
+}
+
+/** What the shelves are narrowed to besides the kind. */
+enum class Only { ALL, NEVER, LOVED }
+
+/** A small door to another room of the shop: the catalogue, the member card, the bin. */
+@Composable
+private fun MoreTile(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, sub: String, onClick: () -> Unit, modifier: Modifier) {
+    Column(modifier.clip(U.RMd).background(U.c.surface).border(1.dp, U.c.line, U.RMd).clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp)) {
+        Icon(icon, null, tint = U.c.cyan, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.height(6.dp))
+        Text(title, style = UType.Strong.copy(fontSize = 14.sp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(sub, style = UType.Small, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

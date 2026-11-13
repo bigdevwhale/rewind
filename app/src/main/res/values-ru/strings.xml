@@ -330,4 +330,6 @@
     <string name="tape_delete">Удалить</string>
     <string name="tape_delete_title">Удалить «%s» из проката?</string>
     <string name="tape_delete_text">Пропадёт насовсем вместе с квитанциями. Отменить будет нельзя.</string>
+    <string name="only_loved">★ 4 и выше</string>
+    <string name="filter_none">Под этот фильтр на полках ничего нет.</string>
 </resources>

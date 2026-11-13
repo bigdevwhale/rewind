@@ -6,6 +6,19 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.3.0] - 2026-11-13
+
+### Added
+- A filter over the shelves on the main screen: one kind of box (films, series, anime, albums, books, comics, manga) and/or only what you haven't taken yet or rated ★ 4 and up. It stays at the top while you scroll.
+
+### Changed
+- The catalogue, the member card and the bin moved from the very bottom of the main screen to three tiles under "Bring in", so a long list no longer hides them.
+
+<!-- tg
+Новое: на главном экране появился фильтр полок – по виду (фильмы, сериалы, альбомы, книги…) и «ещё не брали» / «★ 4 и выше».
+Картотека, абонемент и уценка теперь сразу под кнопками, а не в самом низу длинного списка.
+-->
+
 ## [1.2.1] - 2026-11-13
 
 ### Fixed
