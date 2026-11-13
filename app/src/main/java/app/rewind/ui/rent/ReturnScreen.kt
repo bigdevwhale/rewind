@@ -1,5 +1,6 @@
 package app.rewind.ui.rent
 
+import app.rewind.ui.components.Tip
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -84,7 +85,7 @@ fun ReturnScreen(id: Long, h: Home, go: Go) {
     }
     val late = r.overdue(h.now)
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).imePadding()) {
-        TopBar(stringResource(R.string.give_back), go::back)
+        TopBar(stringResource(R.string.give_back), go::back, tip = Tip.RETURN)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
             Text(t.title, style = UType.Display)
             Text(

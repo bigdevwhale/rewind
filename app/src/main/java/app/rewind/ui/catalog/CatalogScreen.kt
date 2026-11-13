@@ -1,5 +1,6 @@
 package app.rewind.ui.catalog
 
+import app.rewind.ui.components.Tip
 import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -103,7 +104,7 @@ fun CatalogScreen(h: Home, go: Go) {
     }
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).imePadding()) {
-        TopBar(stringResource(R.string.catalog_title), go::back)
+        TopBar(stringResource(R.string.catalog_title), go::back, tip = Tip.CATALOG)
         Column(Modifier.padding(horizontal = 20.dp)) {
             Field(query, { query = it }, stringResource(R.string.catalog_search))
             Spacer(Modifier.height(10.dp))

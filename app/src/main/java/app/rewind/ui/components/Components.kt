@@ -168,13 +168,15 @@ fun IconDisc(icon: ImageVector, size: Dp = 44.dp) {
 }
 
 @Composable
-fun TopBar(title: String, onBack: (() -> Unit)?, actions: @Composable RowScope.() -> Unit = {}) {
+fun TopBar(title: String, onBack: (() -> Unit)?, tip: Tip? = null, actions: @Composable RowScope.() -> Unit = {}) {
+    if (tip != null) TipSheet(tip)
     Row(Modifier.fillMaxWidth().height(60.dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         if (onBack != null) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back), tint = U.c.ink) }
         } else Spacer(Modifier.width(14.dp))
         Text(title, style = UType.Title, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
         actions()
+        if (tip != null) TipButton(tip)
     }
 }
 

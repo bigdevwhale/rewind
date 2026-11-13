@@ -1,5 +1,6 @@
 package app.rewind.ui.bin
 
+import app.rewind.ui.components.Tip
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,7 +56,7 @@ fun BinScreen(h: Home, go: Go) {
     val container = c.container
     var throwing by rememberSaveable { mutableLongStateOf(0L) }
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
-        TopBar(stringResource(R.string.bin_title), go::back)
+        TopBar(stringResource(R.string.bin_title), go::back, tip = Tip.BIN)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
             Clerk(stringResource(if (h.bin.isEmpty() && h.bleached.isEmpty()) R.string.bin_clerk_empty else R.string.bin_clerk))
             if (h.bleached.isNotEmpty()) {

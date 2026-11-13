@@ -1,5 +1,6 @@
 package app.rewind.data
 
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -66,6 +67,13 @@ class SettingsStore(context: Context) {
         }
     }
 
+    /** The screens whose tip has been read. */
+    val tipsSeen: Flow<Set<String>> = store.data.map { it[TIPS] ?: emptySet() }
+
+    suspend fun sawTip(key: String) {
+        store.edit { it[TIPS] = (it[TIPS] ?: emptySet()) + key }
+    }
+
     /** Until when reminders have been sent, so none goes out twice. */
     suspend fun remindedUntil(): Long = store.data.first()[REMINDED] ?: 0L
 
@@ -83,5 +91,6 @@ class SettingsStore(context: Context) {
         val REMINDERS = booleanPreferencesKey("reminders")
         val NAME = stringPreferencesKey("name")
         val REMINDED = longPreferencesKey("reminded")
+        val TIPS = stringSetPreferencesKey("tips_seen")
     }
 }

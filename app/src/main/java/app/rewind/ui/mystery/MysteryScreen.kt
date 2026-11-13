@@ -1,5 +1,6 @@
 package app.rewind.ui.mystery
 
+import app.rewind.ui.components.Tip
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -76,7 +77,7 @@ fun MysteryScreen(h: Home, go: Go) {
     val tape = h.tape(picked)
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
-        TopBar(stringResource(R.string.wrapped), go::back)
+        TopBar(stringResource(R.string.wrapped), go::back, tip = Tip.WRAPPED)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             if (tape == null) {
                 Clerk(stringResource(R.string.wrap_clerk))

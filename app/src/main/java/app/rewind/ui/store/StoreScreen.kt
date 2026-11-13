@@ -1,5 +1,8 @@
 package app.rewind.ui.store
 
+import app.rewind.ui.components.TipSheet
+import app.rewind.ui.components.TipButton
+import app.rewind.ui.components.Tip
 import app.rewind.ui.components.Chip
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
@@ -89,6 +92,7 @@ fun StoreScreen(h: Home, go: Go) {
         Only.LOVED -> h.stars(t) >= 4
     }
     val filtered = kindOnly != null || only != Only.ALL
+    if (h.settings.onboarded) TipSheet(Tip.STORE)
     LazyColumn(
         Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(U.c.bg, U.c.bg, U.c.carpet.copy(alpha = 0.55f)))),
         contentPadding = PaddingValues(bottom = 32.dp),
@@ -98,6 +102,7 @@ fun StoreScreen(h: Home, go: Go) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = go::catalog) { Icon(Icons.Rounded.Search, stringResource(R.string.catalog_title), tint = U.c.muted) }
                     Spacer(Modifier.weight(1f))
+                    TipButton(Tip.STORE)
                     IconButton(onClick = go::card) { Icon(Icons.Rounded.Style, stringResource(R.string.card_title), tint = U.c.muted) }
                     IconButton(onClick = go::settings) { Icon(Icons.Rounded.Settings, stringResource(R.string.settings), tint = U.c.muted) }
                 }

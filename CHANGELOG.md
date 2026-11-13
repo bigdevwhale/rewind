@@ -6,6 +6,15 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.4.0] - 2026-11-13
+
+### Added
+- Every screen has a short how-to from the clerk: the shop, «Bring in», the wrapped tape, the member card, the card catalogue, the bin, a tape's page and returning. It shows the first time a screen opens; the «?» at the top brings it back.
+
+<!-- tg
+Новое: на каждом экране есть короткая подсказка от продавца – как устроены прокат, «Принести», «В обёртке», абонемент, картотека, уценка и возврат. Она показывается при первом входе, а «?» вверху открывает её снова.
+-->
+
 ## [1.3.0] - 2026-11-13
 
 ### Added

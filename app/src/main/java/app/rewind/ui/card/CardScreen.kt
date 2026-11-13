@@ -1,5 +1,6 @@
 package app.rewind.ui.card
 
+import app.rewind.ui.components.Tip
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -71,7 +72,7 @@ fun CardScreen(h: Home, go: Go) {
     val roll = h.rentals.filter { Instant.ofEpochMilli(it.outAt).atZone(h.zone).year == year }.sortedBy { it.outAt }
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
-        TopBar(stringResource(R.string.card_title), go::back)
+        TopBar(stringResource(R.string.card_title), go::back, tip = Tip.CARD)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
             // The card itself.
             Column(Modifier.fillMaxWidth().clip(U.RMd).background(U.c.paper).padding(16.dp)) {

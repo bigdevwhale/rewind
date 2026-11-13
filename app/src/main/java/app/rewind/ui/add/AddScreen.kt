@@ -1,5 +1,6 @@
 package app.rewind.ui.add
 
+import app.rewind.ui.components.Tip
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -109,7 +110,7 @@ fun AddScreen(id: Long, h: Home, go: Go) {
     }
 
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).imePadding()) {
-        TopBar(stringResource(if (editing != null) R.string.edit else R.string.bring_in), go::back)
+        TopBar(stringResource(if (editing != null) R.string.edit else R.string.bring_in), go::back, tip = if (editing != null) null else Tip.ADD)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
             KindPicker(d.kind, { d = d.copy(kind = it) })
             Spacer(Modifier.height(14.dp))

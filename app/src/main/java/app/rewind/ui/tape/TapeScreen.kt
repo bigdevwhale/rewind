@@ -1,5 +1,6 @@
 package app.rewind.ui.tape
 
+import app.rewind.ui.components.Tip
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -90,7 +91,7 @@ fun TapeScreen(id: Long, h: Home, go: Go) {
         scope.launch { if (!container.store.ownCover(id, uri)) Toast.makeText(c, R.string.cover_failed, Toast.LENGTH_SHORT).show() }
     }
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
-        TopBar(T.kind(c, t.kindOf), go::back) {
+        TopBar(T.kind(c, t.kindOf), go::back, tip = Tip.TAPE) {
             IconButton(onClick = {
                 val text = Shares.card(t.kindOf, t.title, t.creator, t.year, t.minutes, t.blurb, h.settings.name)
                 c.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), null))
