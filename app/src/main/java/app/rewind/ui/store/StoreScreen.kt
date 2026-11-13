@@ -1,5 +1,8 @@
 package app.rewind.ui.store
 
+import app.rewind.ui.art.aspect
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -166,11 +169,12 @@ fun Clerk(text: String, modifier: Modifier = Modifier) {
 private fun Counter(h: Home, go: Go) {
     Column(Modifier.padding(horizontal = 20.dp)) {
         SectionTitle(stringResource(R.string.at_home, h.out.size, Rules.MAX_OUT))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Both hands the same height, whatever is in them.
+        Row(Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             (0 until Rules.MAX_OUT).forEach { i ->
                 val r = h.out.getOrNull(i)
                 val t = r?.let { h.tape(it.tapeId) }
-                if (r != null && t != null) OutSlot(t, r, h, go, Modifier.weight(1f)) else FreeSlot(Modifier.weight(1f))
+                if (r != null && t != null) OutSlot(t, r, h, go, Modifier.weight(1f).fillMaxHeight()) else FreeSlot(Modifier.weight(1f).fillMaxHeight())
             }
         }
     }
@@ -184,7 +188,8 @@ private fun OutSlot(t: Tape, r: Rental, h: Home, go: Go, modifier: Modifier) {
         modifier.clip(U.RMd).background(U.c.surface).border(1.dp, if (late) U.c.amber else U.c.cyan.copy(alpha = 0.5f), U.RMd).clickable { go.giveBack(r.id) }.padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        TapeBox(t, rememberCover(t.face), width = 72.dp, wear = h.wear(t))
+        // The box stands in a slot as tall as the tallest kind, so titles line up across the two hands.
+        Box(Modifier.height(boxSlot(72.dp)), contentAlignment = Alignment.BottomCenter) { TapeBox(t, rememberCover(t.face), width = 72.dp, wear = h.wear(t)) }
         Spacer(Modifier.height(8.dp))
         Text(t.title, style = UType.Strong, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(
@@ -199,12 +204,15 @@ private fun OutSlot(t: Tape, r: Rental, h: Home, go: Go, modifier: Modifier) {
 @Composable
 private fun FreeSlot(modifier: Modifier) {
     Box(
-        modifier.height(196.dp).clip(U.RMd).background(U.c.surface.copy(alpha = 0.4f)).border(1.5.dp, U.c.line, U.RMd),
+        modifier.heightIn(min = 196.dp).clip(U.RMd).background(U.c.surface.copy(alpha = 0.4f)).border(1.5.dp, U.c.line, U.RMd),
         contentAlignment = Alignment.Center,
     ) {
         Text(stringResource(R.string.free_hand), style = UType.Muted.copy(color = U.c.faint), textAlign = TextAlign.Center, modifier = Modifier.padding(16.dp))
     }
 }
+
+/** Height that fits a box of any kind at [width]: the tallest one is a VHS. */
+private fun boxSlot(width: androidx.compose.ui.unit.Dp) = width / Kind.entries.minOf { it.aspect() }
 
 /** A shelf of boxes face out, scrolling sideways, on its plank. */
 @Composable
@@ -212,10 +220,13 @@ private fun Aisle(title: String, tapes: List<Tape>, h: Home, go: Go, hand: Boole
     Column(Modifier.padding(top = 8.dp)) {
         if (hand) Text(title, style = UType.Note.copy(color = U.c.amber), modifier = Modifier.padding(start = 24.dp, top = 18.dp, bottom = 6.dp).rotate(-1.5f))
         else SectionTitle(title, Modifier.padding(start = 20.dp))
-        LazyRow(contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.Bottom) {
+        LazyRow(contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.Top) {
             items(tapes, key = { it.id }) { t ->
                 Column(Modifier.width(104.dp).clickable { go.tape(t.id) }) {
-                    TapeBox(t, rememberCover(t.face), fade = h.fade(t), wear = h.wear(t), sticker = if (h.watched(t) == 0 && t.readyAt > h.now - 7 * Rules.DAY && tag == null) stringResource(R.string.sticker_new) else null)
+                    // Boxes of every kind stand on one line and their titles sit on one line under them.
+                    Box(Modifier.fillMaxWidth().height(boxSlot(104.dp)), contentAlignment = Alignment.BottomCenter) {
+                        TapeBox(t, rememberCover(t.face), fade = h.fade(t), wear = h.wear(t), sticker = if (h.watched(t) == 0 && t.readyAt > h.now - 7 * Rules.DAY && tag == null) stringResource(R.string.sticker_new) else null)
+                    }
                     Spacer(Modifier.height(6.dp))
                     Text(tag?.invoke(t) ?: t.title, style = UType.Small.copy(color = if (tag != null) U.c.cyan else U.c.muted), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     val stars = h.stars(t)

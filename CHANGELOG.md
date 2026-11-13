@@ -6,6 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.2.1] - 2026-11-13
+
+### Fixed
+- The two slots of "At home" are the same height, whatever kind of box is in them, and their titles line up.
+- On every shelf, boxes of different kinds stand on one line and their titles sit on one line under them.
+
+<!-- tg
+Исправлено: карточки «На руках» одного размера, а названия на полках стоят на одном уровне.
+-->
+
 ## [1.2.0] - 2026-11-13
 
 ### Added
