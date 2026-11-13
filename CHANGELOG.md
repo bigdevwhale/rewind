@@ -6,6 +6,15 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.2.0] - 2026-11-13
+
+### Added
+- Delete a tape added by mistake: the trash can on the tape's screen removes it from the shop for good, with its slips, after a confirmation (#3).
+
+<!-- tg
+Новое: фильм, сериал, альбом или книгу, добавленные по ошибке, можно удалить – значок корзины на странице кассеты.
+-->
+
 ## [1.1.1] - 2026-11-08
 
 ### Added

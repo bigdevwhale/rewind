@@ -327,4 +327,7 @@
     <string name="cover_reset">Вернуть обложку из каталога</string>
     <string name="cover_remove">Убрать свою обложку</string>
     <string name="cover_failed">Не получилось открыть картинку</string>
+    <string name="tape_delete">Удалить</string>
+    <string name="tape_delete_title">Удалить «%s» из проката?</string>
+    <string name="tape_delete_text">Пропадёт насовсем вместе с квитанциями. Отменить будет нельзя.</string>
 </resources>

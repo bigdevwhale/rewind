@@ -1,5 +1,10 @@
 package app.rewind.ui.tape
 
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.rounded.Delete
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -72,6 +77,15 @@ fun TapeScreen(id: Long, h: Home, go: Go) {
     val container = c.container
     val slips = h.rentals(id).filter { !it.out }
     val scope = rememberCoroutineScope()
+    var deleting by remember { mutableStateOf(false) }
+    if (deleting) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { deleting = false },
+        title = { Text(stringResource(R.string.tape_delete_title, t.title)) },
+        text = { Text(stringResource(R.string.tape_delete_text)) },
+        confirmButton = { app.rewind.ui.components.TextLink(stringResource(R.string.tape_delete), { deleting = false; go.back(); container.write { store.forget(id) } }, color = U.c.stamp) },
+        dismissButton = { app.rewind.ui.components.TextLink(stringResource(R.string.cancel), { deleting = false }) },
+        containerColor = U.c.surface,
+    )
     val pick = rememberImagePicker { uri ->
         scope.launch { if (!container.store.ownCover(id, uri)) Toast.makeText(c, R.string.cover_failed, Toast.LENGTH_SHORT).show() }
     }
@@ -82,6 +96,8 @@ fun TapeScreen(id: Long, h: Home, go: Go) {
                 c.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), null))
             }) { Icon(Icons.Rounded.Share, stringResource(R.string.recommend), tint = U.c.muted) }
             IconButton(onClick = { go.edit(id) }) { Icon(Icons.Rounded.Edit, stringResource(R.string.edit), tint = U.c.muted) }
+            // Added the wrong one? Out of the shop for good, slips and all (#3).
+            IconButton(onClick = { deleting = true }) { Icon(Icons.Rounded.Delete, stringResource(R.string.tape_delete), tint = U.c.muted) }
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
             Row(verticalAlignment = Alignment.Bottom) {
